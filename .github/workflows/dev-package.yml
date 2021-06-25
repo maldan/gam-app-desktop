@@ -1,0 +1,26 @@
+name: Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "14.15.3"
+          registry-url: https://registry.npmjs.org/
+      - run: git config --global user.name maldan
+      - run: git config --global user.email blackwanted@yandex.ru
+
+      - run: wget https://raw.githubusercontent.com/maldan/npm-semver/main/semver.js
+      - run: node ./semver.js
+
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

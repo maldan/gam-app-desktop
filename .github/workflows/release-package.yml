@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.16"
+      - run: go version
+
+      - run: cd frontend && npm ci && npm run build && cd ..
+      - run: GOARCH=amd64 GOOS=linux go build -ldflags "-s -w" -o app .
+      - run: GOARCH=amd64 GOOS=windows go build -ldflags "-s -w" -o app.exe .
+      - run: zip -9 -r application-linux-amd64.zip app
+      - run: zip -9 -r application-windows-amd64.zip app.exe
+
+      - run: echo "RELEASE_VERSION=`git tag | sort -V | tail -1`" >> $GITHUB_ENV
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          title: Release ${{ env.RELEASE_VERSION }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: ${{ env.RELEASE_VERSION }}
+          files: |
+            application-linux-amd64.zip
+            application-windows-amd64.zip

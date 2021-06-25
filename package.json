@@ -1,0 +1,15 @@
+{
+  "name": "@maldan/gam-app-desktop",
+  "version": "0.0.1",
+  "description": "Desktop",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Maldan",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maldan/gam-app-desktop.git"
+  },
+  "license": "MIT",
+  "devDependencies": {}
+}
