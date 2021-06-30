@@ -2,18 +2,36 @@
   <div
     class="window"
     :style="{
-      left: modelValue.x + 'px',
-      top: modelValue.y + 'px',
-      width: modelValue.width + 'px',
-      height: modelValue.height + 'px',
+      left: modelValue.isMaximized ? `0px` : modelValue.x + 'px',
+      top: modelValue.isMaximized ? `0px` : modelValue.y + 'px',
+      width: modelValue.isMaximized ? `100%` : modelValue.width + 'px',
+      height: modelValue.isMaximized ? `calc(100% - 40px)` : modelValue.height + 'px',
       zIndex: $root.topPid == modelValue.pid ? 10 : 1,
     }"
   >
-    <div draggable="false" ref="header" class="header" @mousedown="down">
+    <div draggable="false" ref="header" class="header">
       <div>{{ modelValue.title }}</div>
-      <div style="margin-left: auto">
+
+      <div style="margin-left: auto; display: flex">
+        <div
+          @mousedown.stop=""
+          @click.stop="minimize()"
+          class="clickable"
+          style="margin-right: 10px"
+        >
+          _
+        </div>
+        <div
+          @mousedown.stop=""
+          @click.stop="maximize()"
+          class="clickable"
+          style="margin-right: 10px"
+        >
+          []
+        </div>
         <img
-          @click="$emit('close', modelValue.pid)"
+          @mousedown.stop=""
+          @click.stop="$emit('close', modelValue.pid)"
           class="clickable"
           src="../asset/close.svg"
           alt=""
@@ -25,36 +43,15 @@
       <div v-if="$root.isAnyDrag" class="overflow"></div>
       <iframe :src="modelValue.url" frameborder="0"></iframe>
     </div>
-    <div draggable="false" @mousedown="downDrag($event, 'T')" class="t"></div>
-    <div draggable="false" @mousedown="downDrag($event, 'B')" class="b"></div>
-    <div draggable="false" @mousedown="downDrag($event, 'L')" class="l"></div>
-    <div draggable="false" @mousedown="downDrag($event, 'R')" class="r"></div>
-    <div
-      draggable="false"
-      @mousedown="downDrag($event, 'R'), downDrag($event, 'B')"
-      class="rb"
-    ></div>
-    <div
-      draggable="false"
-      @mousedown="downDrag($event, 'L'), downDrag($event, 'B')"
-      class="lb"
-    ></div>
-    <div
-      draggable="false"
-      @mousedown="downDrag($event, 'R'), downDrag($event, 'T')"
-      class="tr"
-    ></div>
-    <div
-      draggable="false"
-      @mousedown="downDrag($event, 'L'), downDrag($event, 'T')"
-      class="tl"
-    ></div>
+
+    <div v-for="x in resize" :key="x" :ref="`resize_${x}`" draggable="false" :class="x"></div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
+import { Helper } from '../util/Helper';
 
 export default defineComponent({
   props: {
@@ -62,82 +59,89 @@ export default defineComponent({
   },
   components: {},
   async mounted() {
-    this.documentMove = (e: MouseEvent) => {
+    this.documentMove = (e: any) => {
       if (!this.modelValue) {
         return;
       }
 
+      if (this.modelValue.isMaximized) {
+        return;
+      }
+
+      const pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+      const pageY = e.changedTouches ? e.changedTouches[0].pageY : e.pageY;
+
       if (this.isDrag) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          x: this.modelValue.x + (e.pageX - this.capture.x),
-          y: this.modelValue.y + (e.pageY - this.capture.y),
+          x: this.modelValue.x + (pageX - this.capture.x),
+          y: this.modelValue.y + (pageY - this.capture.y),
         });
       }
 
       if (this.isDragB) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          height: this.modelValue.height + (e.pageY - this.capture.y),
+          height: this.modelValue.height + (pageY - this.capture.y),
         });
       }
 
       if (this.isDragT) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          y: this.modelValue.y + (e.pageY - this.capture.y),
-          height: this.modelValue.height - (e.pageY - this.capture.y),
+          y: this.modelValue.y + (pageY - this.capture.y),
+          height: this.modelValue.height - (pageY - this.capture.y),
         });
       }
 
       if (this.isDragR) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          width: this.modelValue.width + (e.pageX - this.capture.x),
+          width: this.modelValue.width + (pageX - this.capture.x),
         });
       }
 
       if (this.isDragL) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          x: this.modelValue.x + (e.pageX - this.capture.x),
-          width: this.modelValue.width - (e.pageX - this.capture.x),
+          x: this.modelValue.x + (pageX - this.capture.x),
+          width: this.modelValue.width - (pageX - this.capture.x),
         });
       }
 
       if (this.isDragR && this.isDragB) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          width: this.modelValue.width + (e.pageX - this.capture.x),
-          height: this.modelValue.height + (e.pageY - this.capture.y),
+          width: this.modelValue.width + (pageX - this.capture.x),
+          height: this.modelValue.height + (pageY - this.capture.y),
         });
       }
 
       if (this.isDragL && this.isDragB) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          x: this.modelValue.x + (e.pageX - this.capture.x),
-          width: this.modelValue.width - (e.pageX - this.capture.x),
-          height: this.modelValue.height + (e.pageY - this.capture.y),
+          x: this.modelValue.x + (pageX - this.capture.x),
+          width: this.modelValue.width - (pageX - this.capture.x),
+          height: this.modelValue.height + (pageY - this.capture.y),
         });
       }
 
       if (this.isDragR && this.isDragT) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          width: this.modelValue.width + (e.pageX - this.capture.x),
-          y: this.modelValue.y + (e.pageY - this.capture.y),
-          height: this.modelValue.height - (e.pageY - this.capture.y),
+          width: this.modelValue.width + (pageX - this.capture.x),
+          y: this.modelValue.y + (pageY - this.capture.y),
+          height: this.modelValue.height - (pageY - this.capture.y),
         });
       }
 
       if (this.isDragL && this.isDragT) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          y: this.modelValue.y + (e.pageY - this.capture.y),
-          height: this.modelValue.height - (e.pageY - this.capture.y),
-          x: this.modelValue.x + (e.pageX - this.capture.x),
-          width: this.modelValue.width - (e.pageX - this.capture.x),
+          y: this.modelValue.y + (pageY - this.capture.y),
+          height: this.modelValue.height - (pageY - this.capture.y),
+          x: this.modelValue.x + (pageX - this.capture.x),
+          width: this.modelValue.width - (pageX - this.capture.x),
         });
       }
 
@@ -148,8 +152,8 @@ export default defineComponent({
       (this.$root as any).isAnyDrag = true;
 
       this.capture = {
-        x: e.pageX,
-        y: e.pageY,
+        x: pageX,
+        y: pageY,
       };
     };
 
@@ -166,29 +170,75 @@ export default defineComponent({
       (this.$root as any).isAnyDrag = false;
     };
 
-    document.addEventListener('mousemove', this.documentMove);
-    document.addEventListener('mouseup', this.documentUp);
+    Helper.addEventListener(document, 'mousemove touchmove', this.documentMove);
+    Helper.addEventListener(document, 'mouseup touchend', this.documentUp);
+    Helper.addEventListener(this.$refs['header'] as any, 'mousedown touchstart', this.down);
+
+    this.resize.forEach((x: string) => {
+      Helper.addEventListener(this.$refs[`resize_${x}`], 'mousedown touchstart', (e: any) => {
+        const y = x.split('').map((xx) => xx.toUpperCase());
+        y.forEach((yyy) => {
+          this.downDrag(e, yyy);
+        });
+      });
+    });
   },
   beforeUnmount() {
-    document.removeEventListener('mousemove', this.documentMove);
-    document.removeEventListener('mouseup', this.documentUp);
+    Helper.removeEventListener(document, 'mousemove touchmove', this.documentMove);
+    Helper.removeEventListener(document, 'mouseup touchend', this.documentUp);
   },
   methods: {
     down(e: any) {
+      const pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+      const pageY = e.changedTouches ? e.changedTouches[0].pageY : e.pageY;
+
       this.isDrag = true;
       this.capture = {
-        x: e.pageX,
-        y: e.pageY,
+        x: pageX,
+        y: pageY,
       };
       (this.$root as any).topPid = this.modelValue?.pid;
     },
     downDrag(e: any, dir: string) {
+      const pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
+      const pageY = e.changedTouches ? e.changedTouches[0].pageY : e.pageY;
+
       this.capture = {
-        x: e.pageX,
-        y: e.pageY,
+        x: pageX,
+        y: pageY,
       };
       // @ts-ignore
       this[`isDrag${dir}`] = true;
+    },
+    async maximize() {
+      if (this.modelValue) {
+        const isMaximized = !this.modelValue.isMaximized;
+
+        this.$emit('update:modelValue', {
+          ...this.modelValue,
+          //isMinimized: false,
+          isMaximized: isMaximized,
+        });
+        await RestApi.process.setWindow({
+          ...(this.modelValue as any),
+          //isMinimized: false,
+          isMaximized: isMaximized,
+        });
+      }
+    },
+    async minimize() {
+      if (this.modelValue) {
+        this.$emit('update:modelValue', {
+          ...this.modelValue,
+          isMinimized: true,
+          //isMaximized: false,
+        });
+        await RestApi.process.setWindow({
+          ...(this.modelValue as any),
+          isMinimized: true,
+          //isMaximized: false,
+        });
+      }
     },
   },
   data: () => {
@@ -206,6 +256,8 @@ export default defineComponent({
 
       documentMove: null as any,
       documentUp: null as any,
+
+      resize: ['l', 'r', 't', 'b', 'tr', 'tl', 'br', 'bl'],
     };
   },
 });
@@ -265,8 +317,8 @@ export default defineComponent({
   .t,
   .l,
   .r,
-  .rb,
-  .lb,
+  .br,
+  .bl,
   .tr,
   .tl {
     position: absolute;
@@ -274,64 +326,64 @@ export default defineComponent({
   }
 
   .t {
-    height: 8px;
+    height: 24px;
     width: 100%;
-    top: -8px;
+    top: -24px;
     cursor: s-resize;
   }
 
   .b {
-    height: 8px;
+    height: 24px;
     width: 100%;
-    bottom: -8px;
+    bottom: -24px;
     cursor: s-resize;
   }
 
   .l {
     height: 100%;
-    width: 8px;
-    left: -8px;
+    width: 24px;
+    left: -24px;
     top: 0;
     cursor: e-resize;
   }
 
   .r {
     height: 100%;
-    width: 8px;
-    right: -8px;
+    width: 24px;
+    right: -24px;
     top: 0;
     cursor: e-resize;
   }
 
-  .rb {
-    height: 8px;
-    width: 8px;
-    right: -8px;
-    bottom: -8px;
+  .br {
+    height: 24px;
+    width: 24px;
+    right: -24px;
+    bottom: -24px;
     cursor: nw-resize;
   }
 
-  .lb {
-    height: 8px;
-    width: 8px;
-    left: -8px;
-    bottom: -8px;
+  .bl {
+    height: 24px;
+    width: 24px;
+    left: -24px;
+    bottom: -24px;
     cursor: ne-resize;
   }
 
   .tr {
-    height: 8px;
-    width: 8px;
-    right: -8px;
-    top: -8px;
+    height: 24px;
+    width: 24px;
+    right: -24px;
+    top: -24px;
     cursor: ne-resize;
   }
 
   .tl {
-    height: 8px;
-    width: 8px;
-    left: -8px;
-    top: -8px;
+    height: 24px;
+    width: 24px;
+    left: -24px;
+    top: -24px;
     cursor: nw-resize;
   }
 }

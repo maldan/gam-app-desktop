@@ -28,12 +28,16 @@ export const RestApi = {
       y,
       width,
       height,
+      isMinimized,
+      isMaximized,
     }: {
       pid: number;
       x: number;
       y: number;
       width: number;
       height: number;
+      isMinimized: boolean;
+      isMaximized: boolean;
     }) {
       return (
         await Axios.post(`${API_URL}/process/setWindow`, {
@@ -42,6 +46,8 @@ export const RestApi = {
           y,
           width,
           height,
+          isMinimized,
+          isMaximized,
         })
       ).data.response;
     },

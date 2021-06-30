@@ -1,11 +1,13 @@
 package desktop
 
 type Window struct {
-	Pid    int     `json:"pid"`
-	X      float64 `json:"x"`
-	Y      float64 `json:"y"`
-	Width  float64 `json:"width"`
-	Height float64 `json:"height"`
+	Pid         int     `json:"pid"`
+	X           float64 `json:"x"`
+	Y           float64 `json:"y"`
+	Width       float64 `json:"width"`
+	Height      float64 `json:"height"`
+	IsMinimized bool    `json:"isMinimized"`
+	IsMaximized bool    `json:"isMaximized"`
 }
 
 type Process struct {

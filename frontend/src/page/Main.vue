@@ -1,9 +1,9 @@
 <template>
   <div class="main">
-    <Bottom />
+    <Bottom v-model="windowList" />
     <Window
       @close="closeWindow"
-      v-for="(x, i) in windowList"
+      v-for="(x, i) in windowList.filter((y) => !y.isMinimized)"
       :key="x.pid"
       v-model="windowList[i]"
     />
@@ -65,13 +65,14 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .main {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 0;
   background: url('../asset/bg.jpg');
   width: 100%;
   height: 100%;
   background-size: cover;
+  overflow: 'hidden';
 
   .app {
     user-select: none;
