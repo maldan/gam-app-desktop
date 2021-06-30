@@ -12,7 +12,7 @@ import (
 
 func Start(frontFs embed.FS) {
 	var host = flag.String("host", "127.0.0.1", "host")
-	var port = flag.Int("port", 16000, "port")
+	var port = flag.Int("port", 16001, "port")
 	var gui = flag.Bool("gui", false, "gui")
 	flag.Parse()
 
@@ -28,5 +28,9 @@ func Start(frontFs embed.FS) {
 
 	restserver.Start(fmt.Sprintf("%s:%d", *host, *port), map[string]interface{}{
 		"/": restserver.VirtualFs{Root: "frontend/build/", Fs: frontFs},
+		"/api": map[string]interface{}{
+			"process":     new(ProcessApi),
+			"application": new(ApplicationApi),
+		},
 	})
 }

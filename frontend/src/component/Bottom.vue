@@ -1,5 +1,5 @@
 <template>
-  <router-view />
+  <div class="bottom"></div>
 </template>
 
 <script lang="ts">
@@ -10,15 +10,18 @@ export default defineComponent({
   async mounted() {},
   methods: {},
   data: () => {
-    return {
-      isAnyDrag: false,
-      topPid: 0,
-    };
+    return {};
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.main {
+.bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+  background: #2b2b2b40;
+  backdrop-filter: blur(8px);
 }
 </style>

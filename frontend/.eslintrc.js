@@ -21,6 +21,7 @@ module.exports = {
     'vue/no-use-v-if-with-v-for': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
     'vue/no-unused-components': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
   overrides: [
     {

@@ -10,5 +10,5 @@ import (
 var frontFs embed.FS
 
 func main() {
-	helloworld.Start(frontFs) //
+	helloworld.Start(frontFs)
 }
