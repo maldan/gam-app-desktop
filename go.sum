@@ -1,5 +1,5 @@
-github.com/maldan/go-cmhp v0.0.4 h1:qP5g+LwldXFAFar50soUdOad96iahpnwgXETFd0vovo=
-github.com/maldan/go-cmhp v0.0.4/go.mod h1:e4RTNk90LsA2B4dqYQMjw17WJTI4rNa+OnDxxxxc4hI=
+github.com/maldan/go-cmhp v0.0.5 h1:X7yZD8fI7WyrLMVHQhU80g230wyvs5E95ASFMGKthSA=
+github.com/maldan/go-cmhp v0.0.5/go.mod h1:e4RTNk90LsA2B4dqYQMjw17WJTI4rNa+OnDxxxxc4hI=
 github.com/maldan/go-restserver v1.2.1 h1:k69IcDhDaq9Hp5N3apRY+0JVVNfTsFfBFq/Yh9TAVDQ=
 github.com/maldan/go-restserver v1.2.1/go.mod h1:KG7J81YT14VXwFII4cGXIxzF5ZJAchgfOPd6Zz7uFBM=
 github.com/zserge/lorca v0.1.10 h1:f/xBJ3D3ipcVRCcvN8XqZnpoKcOXV8I4vwqlFyw7ruc=
