@@ -3,9 +3,10 @@ package desktop
 import (
 	"encoding/json"
 	"fmt"
-	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/maldan/go-cmhp"
 )
 
 type ProcessApi int
@@ -18,12 +19,15 @@ type PA_PostRunArgs struct {
 var WindowInfo map[int]Window = make(map[int]Window)
 
 func (u ProcessApi) GetList() interface{} {
-	c, b := exec.Command("gam", "process", "list", "--format=json"), new(strings.Builder)
+	/*c, b := exec.Command("gam", "process", "list", "--format=json"), new(strings.Builder)
 	c.Stdout = b
 	c.SysProcAttr.HideWindow = true
-	c.Run()
+	c.Run()*/
+
+	out := cmhp.ProcessExec("gam", "process", "list", "--format=json")
+
 	var list []Process
-	json.Unmarshal([]byte(b.String()), &list)
+	json.Unmarshal([]byte(out), &list)
 	for i := 0; i < len(list); i++ {
 		list[i].Window = WindowInfo[list[i].Pid]
 		list[i].Window.Pid = list[i].Pid
@@ -45,24 +49,16 @@ func (u ProcessApi) GetList() interface{} {
 }
 
 func (u ProcessApi) PostKill(args Process) {
-	c, b := exec.Command("gam", "process", "kill", fmt.Sprintf("%v", args.Pid)), new(strings.Builder)
-	c.Stdout = b
-	c.SysProcAttr.HideWindow = true
-	c.Run()
-	fmt.Println(b.String())
+	fmt.Println(cmhp.ProcessExec("gam", "process", "kill", fmt.Sprintf("%v", args.Pid)))
 }
 
 func (u ProcessApi) PostRun(args PA_PostRunArgs) {
-	c, b := exec.Command(
-		"gam",
+	out := cmhp.ProcessExec("gam",
 		"run",
 		fmt.Sprintf("%v", args.Url),
-		fmt.Sprintf("--host=%v", args.Host)), new(strings.Builder)
-	c.Stdout = b
-	c.SysProcAttr.HideWindow = true
-	c.Run()
+		fmt.Sprintf("--host=%v", args.Host))
 
-	huilo := strings.Split(b.String(), ", ")
+	huilo := strings.Split(out, ", ")
 	pid, _ := strconv.Atoi(strings.Split(huilo[0], ":")[1])
 	WindowInfo[pid] = Window{Pid: pid, X: 100, Y: 100, Width: 720, Height: 480}
 }
