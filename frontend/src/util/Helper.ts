@@ -10,4 +10,12 @@ export class Helper {
       obj.removeEventListener(x, fn);
     });
   }
+
+  static convertName(name: string) {
+    return name
+      .split('-')
+      .slice(1)
+      .filter((x) => x !== 'app' && x !== 'gam')
+      .join(' ');
+  }
 }

@@ -20,6 +20,7 @@ var WindowInfo map[int]Window = make(map[int]Window)
 func (u ProcessApi) GetList() interface{} {
 	c, b := exec.Command("gam", "process", "list", "--format=json"), new(strings.Builder)
 	c.Stdout = b
+	c.SysProcAttr.HideWindow = true
 	c.Run()
 	var list []Process
 	json.Unmarshal([]byte(b.String()), &list)
@@ -46,6 +47,7 @@ func (u ProcessApi) GetList() interface{} {
 func (u ProcessApi) PostKill(args Process) {
 	c, b := exec.Command("gam", "process", "kill", fmt.Sprintf("%v", args.Pid)), new(strings.Builder)
 	c.Stdout = b
+	c.SysProcAttr.HideWindow = true
 	c.Run()
 	fmt.Println(b.String())
 }
@@ -57,6 +59,7 @@ func (u ProcessApi) PostRun(args PA_PostRunArgs) {
 		fmt.Sprintf("%v", args.Url),
 		fmt.Sprintf("--host=%v", args.Host)), new(strings.Builder)
 	c.Stdout = b
+	c.SysProcAttr.HideWindow = true
 	c.Run()
 
 	huilo := strings.Split(b.String(), ", ")

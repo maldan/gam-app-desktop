@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { Helper } from './util/Helper';
 
 export default defineComponent({
   components: {},
@@ -13,6 +14,7 @@ export default defineComponent({
     return {
       isAnyDrag: false,
       topPid: 0,
+      convertName: Helper.convertName,
     };
   },
 });

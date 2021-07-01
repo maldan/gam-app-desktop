@@ -16,7 +16,7 @@
         :key="x.pid"
       >
         <img src="../asset/app.svg" :alt="x.name" draggable="false" />
-        <div>{{ x.title }}</div>
+        <div>{{ $root.convertName(x.title) }}</div>
       </div>
     </div>
 
@@ -29,7 +29,7 @@
         :key="x.path"
       >
         <img src="../asset/app.svg" :alt="x.name" draggable="false" />
-        <div>{{ convertName(x.name) }}</div>
+        <div>{{ $root.convertName(x.name) }}</div>
       </div>
     </div>
   </div>
@@ -74,13 +74,13 @@ export default defineComponent({
       //(this.$root as any).topPid = x.pid;
     },
 
-    convertName(name: string) {
+    /*convertName(name: string) {
       return name
         .split('-')
         .slice(1)
         .filter((x) => x !== 'app' && x !== 'gam')
         .join(' ');
-    },
+    },*/
   },
   data: () => {
     return {
@@ -120,6 +120,7 @@ export default defineComponent({
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      text-transform: capitalize;
     }
   }
 }
@@ -167,6 +168,7 @@ export default defineComponent({
       text-overflow: ellipsis;
       white-space: nowrap;
       margin-left: 10px;
+      text-transform: capitalize;
     }
 
     &.selected {
