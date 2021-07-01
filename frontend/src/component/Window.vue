@@ -8,27 +8,28 @@
       height: modelValue.isMaximized ? `calc(100% - 40px)` : modelValue.height + 'px',
       zIndex: $root.topPid == modelValue.pid ? 10 : 1,
     }"
+    :class="modelValue.isMaximized ? 'maximized' : ''"
+    v-if="!modelValue.isMinimized"
   >
     <div draggable="false" ref="header" class="header">
-      <div>{{ modelValue.title }}</div>
-
+      <div class="title">{{ modelValue.title.split('-').join(' ') }}</div>
       <div style="margin-left: auto; display: flex">
-        <div
+        <img
           @mousedown.stop=""
           @click.stop="minimize()"
           class="clickable"
-          style="margin-right: 10px"
-        >
-          _
-        </div>
-        <div
+          src="../asset/minimize.svg"
+          alt=""
+          draggable="false"
+        />
+        <img
           @mousedown.stop=""
           @click.stop="maximize()"
           class="clickable"
-          style="margin-right: 10px"
-        >
-          []
-        </div>
+          src="../asset/maximize.svg"
+          alt=""
+          style="margin-left: 20px"
+        />
         <img
           @mousedown.stop=""
           @click.stop="$emit('close', modelValue.pid)"
@@ -36,6 +37,7 @@
           src="../asset/close.svg"
           alt=""
           draggable="false"
+          style="margin-left: 20px"
         />
       </div>
     </div>
@@ -59,7 +61,30 @@ export default defineComponent({
   },
   components: {},
   async mounted() {
-    this.documentMove = (e: any) => {
+    this.init();
+  },
+  beforeUnmount() {
+    this.uninit();
+  },
+  watch: {
+    'modelValue.isMinimized'() {
+      this.init();
+    },
+  },
+  methods: {
+    documentUp(e: MouseEvent) {
+      if (this.isDrag || this.isDragB || this.isDragT || this.isDragL || this.isDragR) {
+        RestApi.process.setWindow(this.modelValue as any);
+      }
+
+      this.isDrag = false;
+      this.isDragT = false;
+      this.isDragB = false;
+      this.isDragL = false;
+      this.isDragR = false;
+      (this.$root as any).isAnyDrag = false;
+    },
+    documentMove(e: any) {
       if (!this.modelValue) {
         return;
       }
@@ -155,39 +180,32 @@ export default defineComponent({
         x: pageX,
         y: pageY,
       };
-    };
-
-    this.documentUp = (e: MouseEvent) => {
-      if (this.isDrag || this.isDragB || this.isDragT || this.isDragL || this.isDragR) {
-        RestApi.process.setWindow(this.modelValue as any);
+    },
+    init() {
+      if (this.modelValue?.isMinimized) {
+        return;
       }
+      this.uninit();
 
-      this.isDrag = false;
-      this.isDragT = false;
-      this.isDragB = false;
-      this.isDragL = false;
-      this.isDragR = false;
-      (this.$root as any).isAnyDrag = false;
-    };
+      this.$nextTick(() => {
+        Helper.addEventListener(document, 'mousemove touchmove', this.documentMove);
+        Helper.addEventListener(document, 'mouseup touchend', this.documentUp);
+        Helper.addEventListener(this.$refs['header'] as any, 'mousedown touchstart', this.down);
 
-    Helper.addEventListener(document, 'mousemove touchmove', this.documentMove);
-    Helper.addEventListener(document, 'mouseup touchend', this.documentUp);
-    Helper.addEventListener(this.$refs['header'] as any, 'mousedown touchstart', this.down);
-
-    this.resize.forEach((x: string) => {
-      Helper.addEventListener(this.$refs[`resize_${x}`], 'mousedown touchstart', (e: any) => {
-        const y = x.split('').map((xx) => xx.toUpperCase());
-        y.forEach((yyy) => {
-          this.downDrag(e, yyy);
+        this.resize.forEach((x: string) => {
+          Helper.addEventListener(this.$refs[`resize_${x}`], 'mousedown touchstart', (e: any) => {
+            const y = x.split('').map((xx) => xx.toUpperCase());
+            y.forEach((yyy) => {
+              this.downDrag(e, yyy);
+            });
+          });
         });
       });
-    });
-  },
-  beforeUnmount() {
-    Helper.removeEventListener(document, 'mousemove touchmove', this.documentMove);
-    Helper.removeEventListener(document, 'mouseup touchend', this.documentUp);
-  },
-  methods: {
+    },
+    uninit() {
+      Helper.removeEventListener(document, 'mousemove touchmove', this.documentMove);
+      Helper.removeEventListener(document, 'mouseup touchend', this.documentUp);
+    },
     down(e: any) {
       const pageX = e.changedTouches ? e.changedTouches[0].pageX : e.pageX;
       const pageY = e.changedTouches ? e.changedTouches[0].pageY : e.pageY;
@@ -214,29 +232,25 @@ export default defineComponent({
       if (this.modelValue) {
         const isMaximized = !this.modelValue.isMaximized;
 
-        this.$emit('update:modelValue', {
-          ...this.modelValue,
-          //isMinimized: false,
-          isMaximized: isMaximized,
-        });
         await RestApi.process.setWindow({
           ...(this.modelValue as any),
-          //isMinimized: false,
+          isMaximized: isMaximized,
+        });
+        this.$emit('update:modelValue', {
+          ...this.modelValue,
           isMaximized: isMaximized,
         });
       }
     },
     async minimize() {
       if (this.modelValue) {
-        this.$emit('update:modelValue', {
-          ...this.modelValue,
-          isMinimized: true,
-          //isMaximized: false,
-        });
         await RestApi.process.setWindow({
           ...(this.modelValue as any),
           isMinimized: true,
-          //isMaximized: false,
+        });
+        this.$emit('update:modelValue', {
+          ...this.modelValue,
+          isMinimized: true,
         });
       }
     },
@@ -254,8 +268,8 @@ export default defineComponent({
         y: 0,
       },
 
-      documentMove: null as any,
-      documentUp: null as any,
+      //documentMove: null as any,
+      //documentUp: null as any,
 
       resize: ['l', 'r', 't', 'b', 'tr', 'tl', 'br', 'bl'],
     };
@@ -266,9 +280,14 @@ export default defineComponent({
 <style lang="scss" scoped>
 .window {
   position: absolute;
-  background: #2b2b2b46;
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(8px);
   border-radius: 8px;
+  user-select: none;
+
+  &.maximized {
+    border-radius: 0;
+  }
 
   .header {
     user-select: none;
@@ -280,6 +299,10 @@ export default defineComponent({
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+
+    .title {
+      text-transform: capitalize;
+    }
   }
 
   .body {

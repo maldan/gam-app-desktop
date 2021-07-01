@@ -1,15 +1,12 @@
 <template>
   <div class="main">
-    <Bottom v-model="windowList" />
+    <Bottom @run="run($event)" :windowList="windowList" :applicationList="applicationList" />
     <Window
       @close="closeWindow"
-      v-for="(x, i) in windowList.filter((y) => !y.isMinimized)"
+      v-for="(x, i) in windowList"
       :key="x.pid"
       v-model="windowList[i]"
     />
-    <div class="app" @click="run(x.name)" v-for="x in applicationList" :key="x.path">
-      {{ x.name }}
-    </div>
   </div>
 </template>
 
@@ -25,8 +22,9 @@ export default defineComponent({
     this.applicationList = await RestApi.application.list();
 
     await this.refresh();
-    // this.run(`maldan/gam-app-caloryman`);
   },
+  computed: {},
+
   methods: {
     async closeWindow(pid: number) {
       await RestApi.process.kill(pid);
@@ -42,7 +40,7 @@ export default defineComponent({
           width: 320,
           height: 240,
           title: p.args['app-id'],
-          url: `http://${p.args.host}:${p.args.port}/`,
+          url: `http://${p.args.host}:${p.args.clientPort || p.args.port}/`,
           ...p.window,
         };
       });
@@ -68,7 +66,7 @@ export default defineComponent({
   position: absolute;
   left: 0;
   top: 0;
-  background: url('../asset/bg.jpg');
+  background: url('https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510_1280.jpg');
   width: 100%;
   height: 100%;
   background-size: cover;

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -57,7 +58,10 @@ func (u ProcessApi) PostRun(args PA_PostRunArgs) {
 		fmt.Sprintf("--host=%v", args.Host)), new(strings.Builder)
 	c.Stdout = b
 	c.Run()
-	fmt.Println(b.String())
+
+	huilo := strings.Split(b.String(), ", ")
+	pid, _ := strconv.Atoi(strings.Split(huilo[0], ":")[1])
+	WindowInfo[pid] = Window{Pid: pid, X: 100, Y: 100, Width: 720, Height: 480}
 }
 
 func (u ProcessApi) PostSetWindow(args Window) {
