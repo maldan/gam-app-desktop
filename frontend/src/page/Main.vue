@@ -31,7 +31,9 @@ export default defineComponent({
       await this.refresh();
     },
     async refresh() {
-      const list = await RestApi.process.list();
+      const list = (await RestApi.process.list()).filter((x: any) => {
+        return x.args['app-id'] !== 'maldan-gam-app-desktop';
+      });
       this.windowList = list.map((p: any) => {
         return {
           pid: p.pid,
