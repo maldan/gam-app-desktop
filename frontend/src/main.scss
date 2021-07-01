@@ -19,12 +19,25 @@ body {
   height: 100%;
 }
 
+* {
+  &::-webkit-scrollbar {
+    width: 10px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50px;
+  }
+}
+
 a {
   color: #fefefe;
 }
 
 .clickable {
   cursor: pointer;
+  user-select: none;
 
   &:hover {
     opacity: 0.7;
