@@ -19,7 +19,7 @@ type PA_PostRunArgs struct {
 var WindowInfo map[int]Window = make(map[int]Window)
 
 func (u ProcessApi) GetList() interface{} {
-	out := cmhp.ProcessExec("gam", "process", "list", "--format=json")
+	out := cmhp.ProcessExec("gam", "process", "list", "--format=json") //x
 
 	var list []Process
 	json.Unmarshal([]byte(out), &list)
