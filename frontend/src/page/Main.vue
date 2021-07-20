@@ -20,8 +20,18 @@ export default defineComponent({
   components: { Bottom, Window },
   async mounted() {
     this.applicationList = await RestApi.application.list();
-
     await this.refresh();
+
+    setInterval(async () => {
+      const l = (await RestApi.process.list()).filter((x: any) => {
+        return x.args.appId !== 'maldan-gam-app-desktop' && x.args.appId !== 'dev-desktop';
+      });
+      const xx = l.map((x: any) => x.pid).sort((a: any, b: any) => a.pid - b.pid);
+      const yy = this.windowList.map((x: any) => x.pid).sort((a: any, b: any) => a.pid - b.pid);
+      if (JSON.stringify(xx) !== JSON.stringify(yy)) {
+        this.refresh(l);
+      }
+    }, 1000);
   },
   computed: {},
 
@@ -30,22 +40,23 @@ export default defineComponent({
       await RestApi.process.kill(pid);
       await this.refresh();
     },
-    async refresh() {
-      const list = (await RestApi.process.list()).filter((x: any) => {
-        return x.args['app-id'] !== 'maldan-gam-app-desktop';
-      });
-      this.windowList = list.map((p: any) => {
-        return {
-          pid: p.pid,
-          x: 300,
-          y: 200,
-          width: 320,
-          height: 240,
-          title: p.args['app-id'],
-          url: `http://${p.args.host}:${p.args.clientPort || p.args.port}/`,
-          ...p.window,
-        };
-      });
+    async refresh(list?: any[]) {
+      this.windowList = (list || (await RestApi.process.list()))
+        .filter((x: any) => {
+          return x.args.appId !== 'maldan-gam-app-desktop' && x.args.appId !== 'dev-desktop';
+        })
+        .map((p: any) => {
+          return {
+            pid: p.pid,
+            x: 300,
+            y: 200,
+            width: 320,
+            height: 240,
+            title: p.args.appId,
+            url: `http://${p.args.host}:${p.args.clientPort || p.args.port}/`,
+            ...p.window,
+          };
+        });
     },
     async run(url: string) {
       await RestApi.process.run(url, window.location.hostname);
