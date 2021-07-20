@@ -36,3 +36,4 @@ jobs:
           files: |
             application-linux-amd64.zip
             application-windows-amd64.zip
+            application-linux-arm64.zip
