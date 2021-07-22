@@ -1,0 +1,1 @@
+go run . --appId=dev-desktop-app --host=127.0.0.1 --port=16000 --clientPort=8080 --initDev=true     
