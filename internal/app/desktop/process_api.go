@@ -1,12 +1,10 @@
 package desktop
 
 import (
-	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 
-	"github.com/maldan/go-cmhp"
+	"github.com/maldan/go-cmhp/cmhp_process"
 )
 
 type ProcessApi int
@@ -19,10 +17,31 @@ type PA_PostRunArgs struct {
 var WindowInfo map[int]Window = make(map[int]Window)
 
 func (u ProcessApi) GetList() interface{} {
-	out := cmhp.ProcessExec("gam", "process", "list", "--format=json")
+	out := cmhp_process.Exec("gam", "pl")
+	list := make([]Process, 0)
 
-	var list []Process
-	json.Unmarshal([]byte(out), &list)
+	// json.Unmarshal([]byte(out), &list)
+	lines := strings.Split(out, "\n\n")
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		l := strings.Split(line, "\n")
+		m := make(map[string]string)
+		for _, kv := range l {
+			kvv := strings.Split(kv, ": ")
+			m[kvv[0]] = kvv[1]
+		}
+		var proc Process
+		To(m, &proc)
+		proc.Pid = Atoi(m["Pid"])
+		proc.Args = m
+		delete(proc.Args, "Pid")
+		delete(proc.Args, "Name")
+		delete(proc.Args, "Cmd")
+		list = append(list, proc)
+	}
+
 	for i := 0; i < len(list); i++ {
 		list[i].Window = WindowInfo[list[i].Pid]
 		list[i].Window.Pid = list[i].Pid
@@ -44,18 +63,26 @@ func (u ProcessApi) GetList() interface{} {
 }
 
 func (u ProcessApi) PostKill(args Process) {
-	fmt.Println(cmhp.ProcessExec("gam", "process", "kill", fmt.Sprintf("%v", args.Pid)))
+	fmt.Println(cmhp_process.Exec("gam", "kill", fmt.Sprintf("%v", args.Pid)))
 }
 
 func (u ProcessApi) PostRun(args PA_PostRunArgs) {
-	out := cmhp.ProcessExec("gam",
+	out := cmhp_process.Exec("gam",
 		"run",
 		fmt.Sprintf("%v", args.Url),
 		fmt.Sprintf("--host=%v", args.Host))
 
-	huilo := strings.Split(out, ", ")
-	pid, _ := strconv.Atoi(strings.Split(huilo[0], ":")[1])
-	WindowInfo[pid] = Window{Pid: pid, X: 100, Y: 100, Width: 720, Height: 480}
+	l := strings.Split(out, "\n")
+	m := make(map[string]string)
+	for _, kv := range l {
+		if kv == "" {
+			continue
+		}
+		kvv := strings.Split(kv, ": ")
+		m[kvv[0]] = kvv[1]
+	}
+
+	WindowInfo[Atoi(m["Pid"])] = Window{Pid: Atoi(m["Pid"]), X: 100, Y: 100, Width: 720, Height: 480}
 }
 
 func (u ProcessApi) PostSetWindow(args Window) {

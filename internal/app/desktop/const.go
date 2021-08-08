@@ -1,5 +1,10 @@
 package desktop
 
+import (
+	"encoding/json"
+	"strconv"
+)
+
 type Window struct {
 	Pid         int     `json:"pid"`
 	X           float64 `json:"x"`
@@ -19,6 +24,18 @@ type Process struct {
 }
 
 type Application struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
+	Name    string `json:"name"`
+	Author  string `json:"author"`
+	Version string `json:"version"`
+	Path    string `json:"path"`
+}
+
+func To(m map[string]string, v interface{}) {
+	out, _ := json.Marshal(m)
+	json.Unmarshal(out, v)
+}
+
+func Atoi(x string) int {
+	xx, _ := strconv.Atoi(x)
+	return xx
 }

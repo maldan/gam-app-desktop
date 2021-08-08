@@ -23,13 +23,13 @@
     <!-- Panel -->
     <div v-if="isShowPanel" class="panel">
       <div
-        @click="$emit('run', x.name), (isShowPanel = false)"
+        @click="$emit('run', x.author + '/' + x.name + '@' + x.version), (isShowPanel = false)"
         class="app clickable"
         v-for="x in applicationList"
         :key="x.path"
       >
         <img src="../asset/app.svg" :alt="x.name" draggable="false" />
-        <div>{{ $root.convertName(x.name) }}</div>
+        <div>{{ x.name }} v{{ x.version }}</div>
       </div>
     </div>
   </div>
