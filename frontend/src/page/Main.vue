@@ -19,7 +19,9 @@ import { RestApi } from '../util/RestApi';
 export default defineComponent({
   components: { Bottom, Window },
   async mounted() {
-    this.applicationList = await RestApi.application.list();
+    this.applicationList = (await RestApi.application.list()).filter(
+      (x: any) => x.name !== 'desktop',
+    );
     await this.refresh();
 
     setInterval(async () => {

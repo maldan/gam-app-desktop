@@ -1,8 +1,10 @@
 package desktop
 
 import (
+	"os"
 	"strings"
 
+	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_process"
 )
 
@@ -29,4 +31,15 @@ func (u ApplicationApi) GetList() interface{} {
 	}
 
 	return list
+}
+
+func (u ApplicationApi) GetIcon(args ArgsIcon) *os.File {
+	args.Context.ContentType = "image/svg+xml"
+
+	if cmhp_file.Exists(args.Path + "/" + "icon.svg") {
+		f, _ := os.Open(args.Path + "/" + "icon.svg")
+		return f
+	}
+	f, _ := os.Open("app.svg")
+	return f
 }

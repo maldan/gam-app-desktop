@@ -12,7 +12,9 @@
     v-if="!modelValue.isMinimized"
   >
     <div draggable="false" ref="header" class="header">
-      <div class="title">{{ $root.convertName(modelValue.title) }}</div>
+      <div class="title">
+        {{ $root.convertName(modelValue.title) }}
+      </div>
       <div style="margin-left: auto; display: flex">
         <img
           @mousedown.stop=""

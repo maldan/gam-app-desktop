@@ -3,6 +3,8 @@ package desktop
 import (
 	"encoding/json"
 	"strconv"
+
+	"github.com/maldan/go-restserver"
 )
 
 type Window struct {
@@ -27,6 +29,11 @@ type Application struct {
 	Name    string `json:"name"`
 	Author  string `json:"author"`
 	Version string `json:"version"`
+	Path    string `json:"path"`
+}
+
+type ArgsIcon struct {
+	Context *restserver.RestServerContext
 	Path    string `json:"path"`
 }
 

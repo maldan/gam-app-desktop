@@ -15,6 +15,8 @@ export default defineComponent({
       isAnyDrag: false,
       topPid: 0,
       convertName: Helper.convertName,
+      // @ts-ignore
+      API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
     };
   },
 });

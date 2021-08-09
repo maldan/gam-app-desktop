@@ -15,7 +15,11 @@
         v-for="x in windowList"
         :key="x.pid"
       >
-        <img src="../asset/app.svg" :alt="x.name" draggable="false" />
+        <img
+          :src="`${$root.API_URL}/application/icon?path=${x.path}`"
+          :alt="x.name"
+          draggable="false"
+        />
         <div>{{ $root.convertName(x.title) }}</div>
       </div>
     </div>
@@ -28,7 +32,12 @@
         v-for="x in applicationList"
         :key="x.path"
       >
-        <img src="../asset/app.svg" :alt="x.name" draggable="false" />
+        <img
+          :src="`${$root.API_URL}/application/icon?path=${x.path}`"
+          :alt="x.name"
+          draggable="false"
+          style="width: 32px"
+        />
         <div>{{ x.name }} v{{ x.version }}</div>
       </div>
     </div>
