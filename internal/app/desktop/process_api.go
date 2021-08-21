@@ -34,11 +34,10 @@ func (u ProcessApi) GetList() interface{} {
 		}
 		var proc Process
 		To(m, &proc)
-		proc.Pid = Atoi(m["Pid"])
+		proc.Pid = Atoi(m["pid"])
 		proc.Args = m
-		delete(proc.Args, "Pid")
-		delete(proc.Args, "Name")
-		delete(proc.Args, "Cmd")
+		delete(proc.Args, "pid")
+		delete(proc.Args, "cmd")
 		list = append(list, proc)
 	}
 
@@ -82,7 +81,7 @@ func (u ProcessApi) PostRun(args PA_PostRunArgs) {
 		m[kvv[0]] = kvv[1]
 	}
 
-	WindowInfo[Atoi(m["Pid"])] = Window{Pid: Atoi(m["Pid"]), X: 100, Y: 100, Width: 720, Height: 480}
+	WindowInfo[Atoi(m["pid"])] = Window{Pid: Atoi(m["pid"]), X: 100, Y: 100, Width: 720, Height: 480}
 }
 
 func (u ProcessApi) PostSetWindow(args Window) {

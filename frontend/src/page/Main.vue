@@ -54,8 +54,8 @@ export default defineComponent({
             y: 200,
             width: 320,
             height: 240,
-            title: p.args.appId,
             url: `http://${p.args.host}:${p.args.clientPort || p.args.port}/`,
+            ...p.args,
             ...p.window,
           };
         });

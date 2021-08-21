@@ -20,7 +20,7 @@
           :alt="x.name"
           draggable="false"
         />
-        <div>{{ $root.convertName(x.title) }}</div>
+        <div>{{ $root.convertName(x.appId) }}</div>
       </div>
     </div>
 
@@ -36,9 +36,12 @@
           :src="`${$root.API_URL}/application/icon?path=${x.path}`"
           :alt="x.name"
           draggable="false"
-          style="width: 32px"
+          style="width: 32px; max-height: 26px"
         />
-        <div>{{ x.name }} v{{ x.version }}</div>
+        <div style="display: flex; flex: 1; align-items: center">
+          {{ x.name }}
+          <div class="version">{{ x.version }}</div>
+        </div>
       </div>
     </div>
   </div>
@@ -123,6 +126,7 @@ export default defineComponent({
       display: block;
       width: 32px;
       margin-right: 15px;
+      max-height: 22px;
     }
 
     > div {
@@ -130,6 +134,16 @@ export default defineComponent({
       text-overflow: ellipsis;
       white-space: nowrap;
       text-transform: capitalize;
+    }
+
+    .version {
+      margin-left: auto;
+      background: #1f1f1f73;
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      color: #9b9b9b;
+      font-weight: bold;
     }
   }
 }
@@ -169,6 +183,7 @@ export default defineComponent({
     img {
       display: block;
       width: 32px;
+      max-height: 22px;
     }
 
     > div {

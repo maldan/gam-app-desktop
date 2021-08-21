@@ -13,7 +13,13 @@
   >
     <div draggable="false" ref="header" class="header">
       <div class="title">
-        {{ $root.convertName(modelValue.title) }}
+        <img
+          :src="`${$root.API_URL}/application/icon?path=${modelValue.path}`"
+          :alt="modelValue.name"
+          draggable="false"
+          style="max-height: 16px"
+        />
+        <div>{{ $root.convertName(modelValue.appId) }}</div>
       </div>
       <div style="margin-left: auto; display: flex">
         <img
@@ -304,6 +310,12 @@ export default defineComponent({
 
     .title {
       text-transform: capitalize;
+      display: flex;
+      align-items: center;
+
+      > div {
+        margin-left: 10px;
+      }
     }
   }
 
