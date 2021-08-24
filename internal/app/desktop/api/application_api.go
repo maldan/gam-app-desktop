@@ -1,18 +1,19 @@
-package desktop
+package api
 
 import (
 	"os"
 	"strings"
 
+	"github.com/maldan/gam-app-desktop/internal/app/desktop/core"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_process"
 )
 
-type ApplicationApi int
+type ApplicationApi struct{}
 
 func (u ApplicationApi) GetList() interface{} {
 	out := cmhp_process.Exec("gam", "al")
-	var list []Application
+	var list []core.Application
 
 	lines := strings.Split(out, "\n\n")
 	for _, line := range lines {
@@ -25,8 +26,8 @@ func (u ApplicationApi) GetList() interface{} {
 			kvv := strings.Split(kv, ": ")
 			m[kvv[0]] = kvv[1]
 		}
-		var app Application
-		To(m, &app)
+		var app core.Application
+		core.To(m, &app)
 		list = append(list, app)
 	}
 

@@ -9,10 +9,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/maldan/gam-app-desktop/internal/app/desktop/api"
+	"github.com/maldan/gam-app-desktop/internal/app/desktop/core"
 	"github.com/maldan/go-restserver"
 )
-
-var DataDir = "."
 
 func Start(frontFs embed.FS) {
 	var host = flag.String("host", "127.0.0.1", "Server Hostname")
@@ -25,7 +25,7 @@ func Start(frontFs embed.FS) {
 	var dataDir = flag.String("dataDir", "db", "Data Directory")
 	_ = flag.String("appId", "id", "App id")
 	flag.Parse()
-	DataDir = *dataDir
+	core.DataDir = *dataDir
 
 	// Copy as dev app
 	if *initDev {
@@ -46,8 +46,8 @@ func Start(frontFs embed.FS) {
 	restserver.Start(fmt.Sprintf("%s:%d", *host, *port), map[string]interface{}{
 		"/": restserver.VirtualFs{Root: "frontend/build/", Fs: frontFs},
 		"/api": map[string]interface{}{
-			"process":     new(ProcessApi),
-			"application": new(ApplicationApi),
+			"process":     api.ProcessApi{},
+			"application": api.ApplicationApi{},
 		},
 	})
 }

@@ -290,7 +290,7 @@ export default defineComponent({
   position: absolute;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(8px);
-  border-radius: 8px;
+  border-radius: 4px;
   user-select: none;
 
   &.maximized {

@@ -1,10 +1,8 @@
-package desktop
+package core
 
 import (
 	"encoding/json"
 	"strconv"
-
-	"github.com/maldan/go-restserver"
 )
 
 type Window struct {
@@ -32,10 +30,7 @@ type Application struct {
 	Path    string `json:"path"`
 }
 
-type ArgsIcon struct {
-	Context *restserver.RestServerContext
-	Path    string `json:"path"`
-}
+var DataDir = ""
 
 func To(m map[string]string, v interface{}) {
 	out, _ := json.Marshal(m)
