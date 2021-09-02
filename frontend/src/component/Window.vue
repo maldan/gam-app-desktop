@@ -24,11 +24,20 @@
       <div style="margin-left: auto; display: flex">
         <img
           @mousedown.stop=""
+          @click.stop="openSettings()"
+          class="clickable"
+          src="../asset/settings.svg"
+          alt=""
+          draggable="false"
+        />
+        <img
+          @mousedown.stop=""
           @click.stop="minimize()"
           class="clickable"
           src="../asset/minimize.svg"
           alt=""
           draggable="false"
+          style="margin-left: 20px"
         />
         <img
           @mousedown.stop=""
@@ -36,6 +45,7 @@
           class="clickable"
           src="../asset/maximize.svg"
           alt=""
+          draggable="false"
           style="margin-left: 20px"
         />
         <img
@@ -51,7 +61,11 @@
     </div>
     <div draggable="false" class="body">
       <div v-if="$root.isAnyDrag" class="overflow"></div>
-      <iframe :src="modelValue.url" frameborder="0"></iframe>
+      <iframe v-show="!isOpenSettings" :src="modelValue.url" frameborder="0"></iframe>
+      <div v-if="isOpenSettings">
+        <textarea v-model="config">Sas</textarea>
+        <button @click="saveConfig()">Save config</button>
+      </div>
     </div>
 
     <div v-for="x in resize" :key="x" :ref="`resize_${x}`" draggable="false" :class="x"></div>
@@ -62,6 +76,7 @@
 import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
 import { Helper } from '../util/Helper';
+import Axios from 'axios';
 
 export default defineComponent({
   props: {
@@ -262,6 +277,21 @@ export default defineComponent({
         });
       }
     },
+    async openSettings() {
+      this.isOpenSettings = !this.isOpenSettings;
+      this.config = JSON.stringify(
+        (await Axios.get(this.modelValue?.url + 'system/config')).data.response,
+        null,
+        4,
+      );
+    },
+    async saveConfig() {
+      try {
+        await Axios.post(this.modelValue?.url + 'system/config', JSON.parse(this.config));
+      } catch (e) {
+        alert(e);
+      }
+    },
   },
   data: () => {
     return {
@@ -270,6 +300,7 @@ export default defineComponent({
       isDragB: false,
       isDragL: false,
       isDragR: false,
+      isOpenSettings: false,
 
       capture: {
         x: 0,
@@ -280,6 +311,7 @@ export default defineComponent({
       //documentUp: null as any,
 
       resize: ['l', 'r', 't', 'b', 'tr', 'tl', 'br', 'bl'],
+      config: '{}',
     };
   },
 });
@@ -288,7 +320,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .window {
   position: absolute;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   border-radius: 4px;
   user-select: none;

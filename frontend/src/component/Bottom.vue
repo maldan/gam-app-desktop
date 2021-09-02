@@ -22,6 +22,12 @@
         />
         <div>{{ $root.convertName(x.appId) }}</div>
       </div>
+      <div class="time">
+        <div>
+          <b>{{ date }}</b>
+        </div>
+        <div>{{ time }}</div>
+      </div>
     </div>
 
     <!-- Panel -->
@@ -50,6 +56,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
+import Moment from 'moment';
 
 export default defineComponent({
   props: {
@@ -61,6 +68,16 @@ export default defineComponent({
     document.addEventListener('click', () => {
       this.isShowPanel = false;
     });
+
+    this.date = Moment().format('DD MMM YY');
+    this.time = Moment().format('HH:mm:ss');
+    this.timer = setInterval(() => {
+      this.date = Moment().format('DD MMM YY');
+      this.time = Moment().format('HH:mm:ss');
+    }, 1000);
+  },
+  beforeUnmount() {
+    clearInterval(this.timer);
   },
   methods: {
     async toggle(x: any) {
@@ -97,6 +114,9 @@ export default defineComponent({
   data: () => {
     return {
       isShowPanel: false,
+      date: '',
+      time: '',
+      timer: null as any,
     };
   },
 });
@@ -157,12 +177,20 @@ export default defineComponent({
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
-  // padding-left: 5px;
   z-index: 20;
+  user-select: none;
 
   .control_panel {
     padding-right: 20px;
     padding-left: 20px;
+  }
+
+  .time {
+    margin-left: auto;
+    padding-right: 15px;
+    color: #bbbbbb;
+    font-size: 13px;
+    text-align: center;
   }
 
   .icon {

@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { Helper } from './util/Helper';
+import Moment from 'moment';
 
 export default defineComponent({
   components: {},
@@ -17,6 +18,7 @@ export default defineComponent({
       convertName: Helper.convertName,
       // @ts-ignore
       API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
+      moment: Moment,
     };
   },
 });
