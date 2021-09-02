@@ -62,9 +62,9 @@
     <div draggable="false" class="body">
       <div v-if="$root.isAnyDrag" class="overflow"></div>
       <iframe v-show="!isOpenSettings" :src="modelValue.url" frameborder="0"></iframe>
-      <div v-if="isOpenSettings">
-        <textarea v-model="config">Sas</textarea>
-        <button @click="saveConfig()">Save config</button>
+      <div class="settings" v-if="isOpenSettings">
+        <JsonEditor :input="config" />
+        <button class="button clickable" @click="saveConfig()">Save config</button>
       </div>
     </div>
 
@@ -77,12 +77,13 @@ import { defineComponent } from 'vue';
 import { RestApi } from '../util/RestApi';
 import { Helper } from '../util/Helper';
 import Axios from 'axios';
+import JsonEditor from './JsonEditor.vue';
 
 export default defineComponent({
   props: {
     modelValue: Object,
   },
-  components: {},
+  components: { JsonEditor },
   async mounted() {
     this.init();
   },
@@ -279,15 +280,15 @@ export default defineComponent({
     },
     async openSettings() {
       this.isOpenSettings = !this.isOpenSettings;
-      this.config = JSON.stringify(
-        (await Axios.get(this.modelValue?.url + 'system/config')).data.response,
-        null,
-        4,
-      );
+      try {
+        this.config = (await Axios.get(this.modelValue?.url + 'system/config')).data.response;
+      } catch {
+        this.config = {};
+      }
     },
     async saveConfig() {
       try {
-        await Axios.post(this.modelValue?.url + 'system/config', JSON.parse(this.config));
+        await Axios.post(this.modelValue?.url + 'system/config', this.config);
       } catch (e) {
         alert(e);
       }
@@ -311,7 +312,8 @@ export default defineComponent({
       //documentUp: null as any,
 
       resize: ['l', 'r', 't', 'b', 'tr', 'tl', 'br', 'bl'],
-      config: '{}',
+      config: {},
+      dataOutput: {},
     };
   },
 });
@@ -379,6 +381,21 @@ export default defineComponent({
     &::-webkit-scrollbar-thumb {
       background: rgba(0, 0, 0, 0.5);
       border-radius: 50px;
+    }
+
+    .settings {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+
+      .textarea {
+        height: 200px;
+        resize: vertical;
+      }
+
+      button {
+        margin-top: 10px;
+      }
     }
   }
 

@@ -53,3 +53,20 @@ a {
 .shadow {
   box-shadow: 0px 1px 6px 2px #00000055;
 }
+
+.textarea {
+  background: #3d3d3d;
+  outline: none;
+  border: 0;
+  padding: 10px;
+  color: #999999;
+}
+
+.button {
+  background: #3d3d3d;
+  outline: none;
+  border: none;
+  border-radius: 2px;
+  padding: 10px 25px;
+  color: #999999;
+}

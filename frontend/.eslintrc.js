@@ -22,6 +22,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 'off',
     'vue/no-unused-components': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
+    'vue/no-mutating-props': 'off',
   },
   overrides: [
     {
