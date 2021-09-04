@@ -14,6 +14,7 @@ type Window struct {
 	IsMinimized bool    `json:"isMinimized"`
 	IsMaximized bool    `json:"isMaximized"`
 	DesktopId   int     `json:"desktopId"`
+	Dock        string  `json:"dock"`
 }
 
 type Process struct {

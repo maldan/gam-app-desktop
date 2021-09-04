@@ -33,6 +33,7 @@ export const RestApi = {
       isMinimized,
       isMaximized,
       desktopId,
+      dock,
     }: {
       pid: number;
       x: number;
@@ -42,6 +43,7 @@ export const RestApi = {
       isMinimized: boolean;
       isMaximized: boolean;
       desktopId: number;
+      dock: string;
     }) {
       return (
         await Axios.post(`${API_URL}/process/setWindow`, {
@@ -53,6 +55,7 @@ export const RestApi = {
           isMinimized,
           isMaximized,
           desktopId,
+          dock,
         })
       ).data.response;
     },

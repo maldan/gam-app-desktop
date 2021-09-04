@@ -1,14 +1,8 @@
 <template>
   <div
     class="window"
-    :style="{
-      left: modelValue.isMaximized ? `0px` : modelValue.x + 'px',
-      top: modelValue.isMaximized ? `0px` : modelValue.y + 'px',
-      width: modelValue.isMaximized ? `100%` : modelValue.width + 'px',
-      height: modelValue.isMaximized ? `calc(100% - 40px)` : modelValue.height + 'px',
-      zIndex: $root.topPid == modelValue.pid ? 10 : 1,
-    }"
-    :class="modelValue.isMaximized ? 'maximized' : ''"
+    :style="windowStyle()"
+    :class="modelValue.dock === 'full' ? 'maximized' : ''"
     v-if="!modelValue.isMinimized"
   >
     <div draggable="false" ref="header" class="header">
@@ -41,9 +35,9 @@
         />
         <img
           @mousedown.stop=""
-          @click.stop="maximize()"
+          @click.stop="isShowDockOption = !isShowDockOption"
           class="clickable"
-          src="../asset/maximize.svg"
+          src="../asset/dock/none.svg"
           alt=""
           draggable="false"
           style="margin-left: 20px"
@@ -57,6 +51,31 @@
           draggable="false"
           style="margin-left: 20px"
         />
+
+        <div class="dock_option" v-if="isShowDockOption">
+          <button
+            v-for="x in dockOptionList"
+            :key="x.value"
+            @click.stop="setDock(x.value)"
+            class="clickable"
+            :class="x.value === modelValue.dock ? 'selected' : ''"
+          >
+            <img :src="x.icon" draggable="false" />
+          </button>
+
+          <!-- <button @click.stop="setDock('')" class="clickable">
+            <img src="../asset/dock/none.svg" draggable="false" />
+          </button>
+          <button @click.stop="setDock('left')" class="clickable">
+            <img src="../asset/dock/left.svg" draggable="false" />
+          </button>
+          <button @click.stop="setDock('full')" class="clickable">
+            <img src="../asset/dock/full.svg" draggable="false" />
+          </button>
+          <button @click.stop="setDock('right')" class="clickable">
+            <img src="../asset/dock/right.svg" draggable="false" />
+          </button> -->
+        </div>
       </div>
     </div>
     <div draggable="false" class="body">
@@ -78,6 +97,7 @@ import { RestApi } from '../util/RestApi';
 import { Helper } from '../util/Helper';
 import Axios from 'axios';
 import JsonEditor from './JsonEditor.vue';
+declare const require: (path: string) => void;
 
 export default defineComponent({
   props: {
@@ -205,6 +225,34 @@ export default defineComponent({
         y: pageY,
       };
     },
+    windowStyle() {
+      const model = this.modelValue || {};
+      // @ts-ignore
+      const topPid = this.$root.topPid;
+      const isDocked = model.dock !== '';
+
+      let left = isDocked ? `0px` : model.x + 'px';
+      let top = isDocked ? `0px` : model.y + 'px';
+      let width = isDocked ? `100%` : model.width + 'px';
+      let height = isDocked ? `calc(100% - 40px)` : model.height + 'px';
+
+      if (model.dock === 'left') {
+        width = '50%';
+      }
+
+      if (model.dock === 'right') {
+        left = '50%';
+        width = '50%';
+      }
+
+      return {
+        left,
+        top,
+        width,
+        height,
+        zIndex: topPid == model.pid ? 10 : 1,
+      };
+    },
     init() {
       if (this.modelValue?.isMinimized) {
         return;
@@ -266,6 +314,20 @@ export default defineComponent({
         });
       }
     },
+    async setDock(dock: string) {
+      this.isShowDockOption = false;
+
+      if (this.modelValue) {
+        await RestApi.process.setWindow({
+          ...(this.modelValue as any),
+          dock,
+        });
+        this.$emit('update:modelValue', {
+          ...this.modelValue,
+          dock,
+        });
+      }
+    },
     async minimize() {
       if (this.modelValue) {
         await RestApi.process.setWindow({
@@ -302,11 +364,19 @@ export default defineComponent({
       isDragL: false,
       isDragR: false,
       isOpenSettings: false,
+      isShowDockOption: false,
 
       capture: {
         x: 0,
         y: 0,
       },
+
+      dockOptionList: [
+        { icon: require('../asset/dock/none.svg'), value: '' },
+        { icon: require('../asset/dock/left.svg'), value: 'left' },
+        { icon: require('../asset/dock/full.svg'), value: 'full' },
+        { icon: require('../asset/dock/right.svg'), value: 'right' },
+      ],
 
       //documentMove: null as any,
       //documentUp: null as any,
@@ -339,7 +409,9 @@ export default defineComponent({
     align-items: center;
     white-space: nowrap;
     text-overflow: ellipsis;
-    overflow: hidden;
+    // overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
 
     .title {
       text-transform: capitalize;
@@ -348,6 +420,30 @@ export default defineComponent({
 
       > div {
         margin-left: 10px;
+      }
+    }
+
+    .dock_option {
+      position: absolute;
+      right: 0px;
+      bottom: -33px;
+      background: #1b1b1b;
+      z-index: 1;
+      padding: 5px;
+      box-sizing: border-box;
+
+      button {
+        background: none;
+        border: 0;
+        outline: none;
+        color: #999999;
+      }
+
+      .selected {
+        img {
+          filter: invert(8%) sepia(100%) saturate(6505%) hue-rotate(124deg) brightness(118%)
+            contrast(123%);
+        }
       }
     }
   }
