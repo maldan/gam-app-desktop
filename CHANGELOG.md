@@ -1,3 +1,9 @@
+## [0.0.18] - 2021-08-04
+
+### Fixed
+-    Multiple desktop
+-    Desktop background
+
 ## [0.0.17] - 2021-08-04
 
 ### Fixed
