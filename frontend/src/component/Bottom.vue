@@ -20,7 +20,7 @@
           :alt="x.name"
           draggable="false"
         />
-        <div>{{ $root.convertName(x.appId) }}</div>
+        <div>{{ x.name.replace(/_/g, ' ') }}</div>
       </div>
       <div class="time">
         <div>
@@ -28,6 +28,13 @@
         </div>
         <div>{{ time }}</div>
       </div>
+      <!-- <img
+        @click.stop="$emit('open')"
+        class="clickable settings"
+        src="../asset/settings.svg"
+        alt="Settings"
+        draggable="false"
+      /> -->
     </div>
 
     <!-- Panel -->
@@ -45,7 +52,7 @@
           style="width: 32px; max-height: 26px"
         />
         <div style="display: flex; flex: 1; align-items: center">
-          {{ x.name }}
+          {{ x.name.replace(/_/g, ' ') }}
           <div class="version">{{ x.version }}</div>
         </div>
       </div>
@@ -183,6 +190,10 @@ export default defineComponent({
   .control_panel {
     padding-right: 20px;
     padding-left: 20px;
+  }
+
+  .settings {
+    padding-right: 20px;
   }
 
   .time {

@@ -1,6 +1,11 @@
 <template>
   <div class="main">
-    <Bottom @run="run($event)" :windowList="windowList" :applicationList="applicationList" />
+    <Bottom
+      @run="run($event)"
+      @open="isShowSettings = !isShowSettings"
+      :windowList="windowList"
+      :applicationList="applicationList"
+    />
     <Window
       @close="closeWindow"
       v-for="(x, i) in windowList"
@@ -36,7 +41,6 @@ export default defineComponent({
     }, 1000);
   },
   computed: {},
-
   methods: {
     async closeWindow(pid: number) {
       await RestApi.process.kill(pid);
@@ -68,9 +72,7 @@ export default defineComponent({
   data: () => {
     return {
       applicationList: [] as any[],
-      windowList: [
-        // { id: 0, x: 100, y: 200, width: 1200, height: 820 }
-      ] as any[],
+      windowList: [] as any[],
     };
   },
 });

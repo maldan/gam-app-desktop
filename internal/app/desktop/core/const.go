@@ -30,7 +30,11 @@ type Application struct {
 	Path    string `json:"path"`
 }
 
+type Config struct {
+}
+
 var DataDir = ""
+var AppConfig Config = Config{}
 
 func To(m map[string]string, v interface{}) {
 	out, _ := json.Marshal(m)

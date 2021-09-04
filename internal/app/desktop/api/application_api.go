@@ -34,7 +34,7 @@ func (u ApplicationApi) GetList() interface{} {
 	return list
 }
 
-func (u ApplicationApi) GetIcon(args ArgsIcon) *os.File {
+func (u ApplicationApi) GetIcon(args ArgsPath) *os.File {
 	args.Context.ContentType = "image/svg+xml"
 
 	if cmhp_file.Exists(args.Path + "/" + "icon.svg") {
@@ -43,4 +43,16 @@ func (u ApplicationApi) GetIcon(args ArgsIcon) *os.File {
 	}
 	f, _ := os.Open("app.svg")
 	return f
+}
+
+// Save config
+func (r ApplicationApi) PostConfig(args ArgsConfig) {
+	cmhp_file.WriteJSON(core.DataDir+"/../"+args.AppId+"/config.json", &args.Config)
+}
+
+// Get config
+func (r ApplicationApi) GetConfig(args ArgsAppId) map[string]interface{} {
+	config := make(map[string]interface{})
+	cmhp_file.ReadJSON(core.DataDir+"/../"+args.AppId+"/config.json", &config)
+	return config
 }

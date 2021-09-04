@@ -19,7 +19,7 @@
           draggable="false"
           style="max-height: 16px"
         />
-        <div>{{ $root.convertName(modelValue.appId) }}</div>
+        <div>{{ modelValue.name.replace(/_/g, ' ') }}</div>
       </div>
       <div style="margin-left: auto; display: flex">
         <img
@@ -281,14 +281,14 @@ export default defineComponent({
     async openSettings() {
       this.isOpenSettings = !this.isOpenSettings;
       try {
-        this.config = (await Axios.get(this.modelValue?.url + 'system/config')).data.response;
+        this.config = (await RestApi.application.getConfig(this.modelValue?.appId + '')) || {};
       } catch {
         this.config = {};
       }
     },
     async saveConfig() {
       try {
-        await Axios.post(this.modelValue?.url + 'system/config', this.config);
+        await RestApi.application.saveConfig(this.modelValue?.appId + '', this.config);
       } catch (e) {
         alert(e);
       }
@@ -313,7 +313,6 @@ export default defineComponent({
 
       resize: ['l', 'r', 't', 'b', 'tr', 'tl', 'br', 'bl'],
       config: {},
-      dataOutput: {},
     };
   },
 });
