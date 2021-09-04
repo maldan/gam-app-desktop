@@ -7,6 +7,10 @@ type ArgsPath struct {
 	Path    string `json:"path"`
 }
 
+type ArgsId struct {
+	Id string `json:"id"`
+}
+
 type ArgsAppId struct {
 	AppId string `json:"appId"`
 }
@@ -17,6 +21,7 @@ type ArgsConfig struct {
 }
 
 type ArgRun struct {
-	Url  string `json:"url"`
-	Host string `json:"host"`
+	Url       string `json:"url"`
+	Host      string `json:"host"`
+	DesktopId int    `json:"desktopId"`
 }

@@ -13,6 +13,7 @@ type Window struct {
 	Height      float64 `json:"height"`
 	IsMinimized bool    `json:"isMinimized"`
 	IsMaximized bool    `json:"isMaximized"`
+	DesktopId   int     `json:"desktopId"`
 }
 
 type Process struct {

@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="bottom">
+      <!-- Open -->
       <img
         @click.stop="isShowPanel = !isShowPanel"
         class="clickable control_panel"
@@ -8,11 +9,25 @@
         alt="Control Panel"
         draggable="false"
       />
+
+      <!-- Multiple -->
+      <div class="multiple">
+        <div
+          class="item clickable"
+          :class="x - 1 === desktopId ? 'selected' : ''"
+          v-for="x in 4"
+          :key="x"
+          @click="$emit('changeDesktop', x - 1)"
+        ></div>
+      </div>
+
+      <!-- Items -->
       <div
         @click="toggle(x)"
         class="clickable icon"
         :class="x.pid === $root.topPid ? 'selected' : ''"
         v-for="x in windowList"
+        v-show="x.desktopId === desktopId"
         :key="x.pid"
       >
         <img
@@ -22,19 +37,14 @@
         />
         <div>{{ x.name.replace(/_/g, ' ') }}</div>
       </div>
+
+      <!-- Time -->
       <div class="time">
         <div>
           <b>{{ date }}</b>
         </div>
         <div>{{ time }}</div>
       </div>
-      <!-- <img
-        @click.stop="$emit('open')"
-        class="clickable settings"
-        src="../asset/settings.svg"
-        alt="Settings"
-        draggable="false"
-      /> -->
     </div>
 
     <!-- Panel -->
@@ -69,6 +79,7 @@ export default defineComponent({
   props: {
     windowList: Array,
     applicationList: Array,
+    desktopId: Number,
   },
   components: {},
   async mounted() {
@@ -134,7 +145,7 @@ export default defineComponent({
   position: absolute;
   left: 0;
   bottom: 40px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.8);
   width: 320px;
   height: 480px;
   display: flex;
@@ -180,7 +191,7 @@ export default defineComponent({
   bottom: 0;
   width: 100%;
   height: 40px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -192,8 +203,23 @@ export default defineComponent({
     padding-left: 20px;
   }
 
-  .settings {
-    padding-right: 20px;
+  .multiple {
+    margin-right: 20px;
+    margin-left: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+
+    .item {
+      width: 18px;
+      height: 13px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 2px;
+
+      &.selected {
+        background: rgba(255, 255, 255, 0.5);
+      }
+    }
   }
 
   .time {

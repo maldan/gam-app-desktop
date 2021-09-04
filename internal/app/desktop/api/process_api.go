@@ -96,7 +96,14 @@ func (u ProcessApi) PostRun(args ArgRun) {
 		m[kvv[0]] = kvv[1]
 	}
 
-	WindowInfo[(m["pid"])] = core.Window{Pid: core.Atoi(m["pid"]), X: 100, Y: 100, Width: 720, Height: 480}
+	WindowInfo[(m["pid"])] = core.Window{
+		Pid:       core.Atoi(m["pid"]),
+		X:         100,
+		Y:         100,
+		Width:     720,
+		Height:    480,
+		DesktopId: args.DesktopId,
+	}
 }
 
 // Set window position

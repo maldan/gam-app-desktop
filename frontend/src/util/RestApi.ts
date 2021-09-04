@@ -15,11 +15,12 @@ export const RestApi = {
         })
       ).data.response;
     },
-    async run(url: string, host: string) {
+    async run(url: string, host: string, desktopId: number) {
       return (
         await Axios.post(`${API_URL}/process/run`, {
           url,
           host,
+          desktopId,
         })
       ).data.response;
     },
@@ -31,6 +32,7 @@ export const RestApi = {
       height,
       isMinimized,
       isMaximized,
+      desktopId,
     }: {
       pid: number;
       x: number;
@@ -39,6 +41,7 @@ export const RestApi = {
       height: number;
       isMinimized: boolean;
       isMaximized: boolean;
+      desktopId: number;
     }) {
       return (
         await Axios.post(`${API_URL}/process/setWindow`, {
@@ -49,6 +52,7 @@ export const RestApi = {
           height,
           isMinimized,
           isMaximized,
+          desktopId,
         })
       ).data.response;
     },

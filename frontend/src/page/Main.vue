@@ -1,14 +1,22 @@
 <template>
-  <div class="main">
+  <div
+    class="main"
+    :style="{
+      backgroundImage: `url(${$root.API_URL}/main/background?id=${desktopId})`,
+    }"
+  >
     <Bottom
       @run="run($event)"
       @open="isShowSettings = !isShowSettings"
       :windowList="windowList"
       :applicationList="applicationList"
+      :desktopId="desktopId"
+      @changeDesktop="desktopId = $event"
     />
     <Window
       @close="closeWindow"
       v-for="(x, i) in windowList"
+      v-show="x.desktopId === desktopId"
       :key="x.pid"
       v-model="windowList[i]"
     />
@@ -65,7 +73,7 @@ export default defineComponent({
         });
     },
     async run(url: string) {
-      await RestApi.process.run(url, window.location.hostname);
+      await RestApi.process.run(url, window.location.hostname, this.desktopId);
       await this.refresh();
     },
   },
@@ -73,6 +81,7 @@ export default defineComponent({
     return {
       applicationList: [] as any[],
       windowList: [] as any[],
+      desktopId: 0,
     };
   },
 });
@@ -83,7 +92,7 @@ export default defineComponent({
   position: absolute;
   left: 0;
   top: 0;
-  background: url('https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510_1280.jpg');
+  // background: url('https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510_1280.jpg');
   width: 100%;
   height: 100%;
   background-size: cover;
