@@ -1,3 +1,9 @@
+## [0.0.17] - 2021-08-04
+
+### Fixed
+-    Global config editor
+-    Other
+
 ## [0.0.16] - 2021-08-02
 
 ### Fixed
