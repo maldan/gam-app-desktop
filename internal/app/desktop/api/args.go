@@ -20,8 +20,13 @@ type ArgsConfig struct {
 	Config map[string]interface{} `json:"config"`
 }
 
-type ArgRun struct {
+type ArgsRun struct {
 	Url       string `json:"url"`
 	Host      string `json:"host"`
 	DesktopId int    `json:"desktopId"`
+}
+
+type ArgsAppData struct {
+	AppId string
+	Data  string
 }
