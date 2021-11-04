@@ -33,6 +33,7 @@ type Application struct {
 }
 
 type Config struct {
+	BackupQueue map[string]string `json:"backupQueue"`
 }
 
 var DataDir = ""
