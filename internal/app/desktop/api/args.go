@@ -1,10 +1,8 @@
 package api
 
-import "github.com/maldan/go-restserver"
-
 type ArgsPath struct {
-	Context *restserver.RestServerContext
-	Path    string `json:"path"`
+	// Context *restserver.RestServerContext
+	Path string `json:"path"`
 }
 
 type ArgsId struct {

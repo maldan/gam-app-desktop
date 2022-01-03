@@ -10,20 +10,24 @@ import (
 	"github.com/maldan/gam-app-desktop/internal/app/desktop/core"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_process"
-	"github.com/maldan/go-restserver"
+	"github.com/maldan/go-rapi"
+	"github.com/maldan/go-rapi/rapi_core"
+	"github.com/maldan/go-rapi/rapi_rest"
+	"github.com/maldan/go-rapi/rapi_vfs"
 )
 
 func Start(frontFs embed.FS) {
+	// Server
 	var host = flag.String("host", "127.0.0.1", "Server Hostname")
 	var port = flag.Int("port", 16001, "Server Port")
 	_ = flag.Int("clientPort", 8080, "Client Port")
-	var _ = flag.Bool("gui", false, "Use Gui")
-	// var initDev = flag.Bool("initDev", false, "Install dev")
-	var _ = flag.Int("width", 1100, "Window Width")
-	var _ = flag.Int("height", 900, "Window Height")
+
+	// Data
 	var dataDir = flag.String("dataDir", "db", "Data Directory")
 	_ = flag.String("appId", "id", "App id")
 	flag.Parse()
+
+	// Set
 	core.DataDir = *dataDir
 
 	// Copy as dev app
@@ -60,12 +64,22 @@ func Start(frontFs embed.FS) {
 		}
 	}()
 
-	restserver.Start(fmt.Sprintf("%s:%d", *host, *port), map[string]interface{}{
-		"/": restserver.VirtualFs{Root: "frontend/build/", Fs: frontFs},
-		"/api": map[string]interface{}{
-			"main":        api.MainApi{},
-			"process":     api.ProcessApi{},
-			"application": api.ApplicationApi{},
+	// Start server
+	rapi.Start(rapi.Config{
+		Host: fmt.Sprintf("%s:%d", *host, *port),
+		Router: map[string]rapi_core.Handler{
+			"/": rapi_vfs.VFSHandler{
+				Root: "frontend/build",
+				Fs:   frontFs,
+			},
+			"/api": rapi_rest.ApiHandler{
+				Controller: map[string]interface{}{
+					"main":        api.MainApi{},
+					"process":     api.ProcessApi{},
+					"application": api.ApplicationApi{},
+				},
+			},
 		},
+		DbPath: core.DataDir,
 	})
 }

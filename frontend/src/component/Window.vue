@@ -6,6 +6,7 @@
     v-if="!modelValue.isMinimized"
   >
     <div draggable="false" ref="header" class="header">
+      <!-- Title -->
       <div class="title">
         <img
           :src="`${$root.API_URL}/application/icon?path=${modelValue.path}`"
@@ -15,41 +16,22 @@
         />
         <div>{{ modelValue.name.replace(/_/g, ' ') }}</div>
       </div>
+
       <div style="margin-left: auto; display: flex">
-        <img
-          @mousedown.stop=""
-          @click.stop="openSettings()"
-          class="clickable"
-          src="../asset/settings.svg"
-          alt=""
-          draggable="false"
-        />
-        <img
-          @mousedown.stop=""
-          @click.stop="minimize()"
-          class="clickable"
-          src="../asset/minimize.svg"
-          alt=""
-          draggable="false"
-          style="margin-left: 20px"
-        />
-        <img
+        <ui-button @mousedown.stop="" @click.stop="openSettings()" class="button" icon="gear" />
+        <ui-button @mousedown.stop="" @click.stop="openInfo()" class="button" icon="info" />
+        <ui-button @mousedown.stop="" @click.stop="minimize()" class="button" icon="minimize" />
+        <ui-button
           @mousedown.stop=""
           @click.stop="isShowDockOption = !isShowDockOption"
-          class="clickable"
-          src="../asset/dock/none.svg"
-          alt=""
-          draggable="false"
-          style="margin-left: 20px"
+          class="button"
+          icon="maximize"
         />
-        <img
+        <ui-button
           @mousedown.stop=""
           @click.stop="$emit('close', modelValue.pid)"
-          class="clickable"
-          src="../asset/close.svg"
-          alt=""
-          draggable="false"
-          style="margin-left: 20px"
+          class="button"
+          icon="close"
         />
 
         <div class="dock_option" v-if="isShowDockOption">
@@ -60,30 +42,27 @@
             class="clickable"
             :class="x.value === modelValue.dock ? 'selected' : ''"
           >
-            <img :src="x.icon" draggable="false" />
+            <ui-icon :name="x.icon" />
           </button>
-
-          <!-- <button @click.stop="setDock('')" class="clickable">
-            <img src="../asset/dock/none.svg" draggable="false" />
-          </button>
-          <button @click.stop="setDock('left')" class="clickable">
-            <img src="../asset/dock/left.svg" draggable="false" />
-          </button>
-          <button @click.stop="setDock('full')" class="clickable">
-            <img src="../asset/dock/full.svg" draggable="false" />
-          </button>
-          <button @click.stop="setDock('right')" class="clickable">
-            <img src="../asset/dock/right.svg" draggable="false" />
-          </button> -->
         </div>
       </div>
     </div>
     <div draggable="false" class="body">
       <div v-if="$root.isAnyDrag" class="overflow"></div>
-      <iframe v-show="!isOpenSettings" :src="modelValue.url" frameborder="0"></iframe>
+      <iframe
+        v-show="!isOpenSettings && !isOpenInfo"
+        :src="modelValue.url"
+        frameborder="0"
+      ></iframe>
       <div class="settings" v-if="isOpenSettings">
         <JsonEditor :input="config" />
         <button class="button clickable" @click="saveConfig()">Save config</button>
+      </div>
+
+      <!-- Info -->
+      <div class="settings" v-if="isOpenInfo">
+        <div>{{ modelValue.url }}</div>
+        <div v-html="$root.format(info)"></div>
       </div>
     </div>
 
@@ -93,10 +72,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { RestApi } from '../util/RestApi';
-import { Helper } from '../util/Helper';
-import Axios from 'axios';
+import { RestApi } from '@/util/RestApi';
+import { Helper } from '@/util/Helper';
 import JsonEditor from './JsonEditor.vue';
+import Axios from 'axios';
 declare const require: (path: string) => void;
 
 export default defineComponent({
@@ -342,11 +321,19 @@ export default defineComponent({
     },
     async openSettings() {
       this.isOpenSettings = !this.isOpenSettings;
+      this.isOpenInfo = false;
+
       try {
         this.config = (await RestApi.application.getConfig(this.modelValue?.appId + '')) || {};
       } catch {
         this.config = {};
       }
+    },
+    async openInfo() {
+      this.isOpenInfo = !this.isOpenInfo;
+      this.isOpenSettings = false;
+      this.info = '';
+      this.info = (await Axios.get(`${this.modelValue?.url}system/info`)).data.response;
     },
     async saveConfig() {
       try {
@@ -365,6 +352,7 @@ export default defineComponent({
       isDragR: false,
       isOpenSettings: false,
       isShowDockOption: false,
+      isOpenInfo: false,
 
       capture: {
         x: 0,
@@ -372,10 +360,10 @@ export default defineComponent({
       },
 
       dockOptionList: [
-        { icon: require('../asset/dock/none.svg'), value: '' },
-        { icon: require('../asset/dock/left.svg'), value: 'left' },
-        { icon: require('../asset/dock/full.svg'), value: 'full' },
-        { icon: require('../asset/dock/right.svg'), value: 'right' },
+        { icon: 'maximize', value: '' },
+        { icon: 'left_screen', value: 'left' },
+        { icon: 'full_screen', value: 'full' },
+        { icon: 'right_screen', value: 'right' },
       ],
 
       //documentMove: null as any,
@@ -383,6 +371,7 @@ export default defineComponent({
 
       resize: ['l', 'r', 't', 'b', 'tr', 'tl', 'br', 'bl'],
       config: {},
+      info: '',
     };
   },
 });
@@ -412,6 +401,12 @@ export default defineComponent({
     // overflow: hidden;
     position: relative;
     box-sizing: border-box;
+
+    .button {
+      padding: 0;
+      background: none;
+      margin-left: 5px;
+    }
 
     .title {
       text-transform: capitalize;
@@ -482,6 +477,11 @@ export default defineComponent({
       display: flex;
       flex-direction: column;
       padding: 10px;
+      overflow-y: auto;
+      height: calc(100% - 25px);
+      background: #2b2b2b;
+      user-select: text;
+      width: calc(100% - 20px);
 
       .textarea {
         height: 200px;

@@ -20,6 +20,23 @@
       :key="x.pid"
       v-model="windowList[i]"
     />
+    <div v-if="isShowFastRun" class="fastRun">
+      <div class="window">
+        <ui-input
+          ref="fastRunInput"
+          @keyup.enter="
+            run(fastRunApplicationList[0].name);
+            isShowFastRun = false;
+            fastRunFilter = '';
+          "
+          placeholder="Filter..."
+          v-model="fastRunFilter"
+        />
+        <div v-for="x in fastRunApplicationList" :key="x.id">
+          {{ x.name }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,10 +44,15 @@
 import { defineComponent } from 'vue';
 import Bottom from '../component/Bottom.vue';
 import Window from '../component/Window.vue';
-import { RestApi } from '../util/RestApi';
+import { RestApi } from '@/util/RestApi';
 
 export default defineComponent({
   components: { Bottom, Window },
+  computed: {
+    fastRunApplicationList() {
+      return this.applicationList.filter((y) => y.name.match(this.fastRunFilter));
+    },
+  },
   async mounted() {
     this.applicationList = (await RestApi.application.list()).filter(
       (x: any) => x.name !== 'desktop',
@@ -47,8 +69,34 @@ export default defineComponent({
         this.refresh(l);
       }
     }, 1000);
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key == 'ArrowRight' && e.ctrlKey) {
+        this.desktopId += 1;
+        if (this.desktopId > 3) this.desktopId = 0;
+      }
+      if (e.key == 'ArrowLeft' && e.ctrlKey) {
+        this.desktopId -= 1;
+        if (this.desktopId < 0) this.desktopId = 3;
+      }
+      if (e.key == 'ArrowDown' && e.ctrlKey) {
+        this.desktopId += 2;
+        if (this.desktopId > 3) this.desktopId = 0;
+      }
+      if (e.key == 'ArrowUp' && e.ctrlKey) {
+        this.desktopId -= 2;
+        if (this.desktopId < 0) this.desktopId = 3;
+      }
+      if (e.key == '`' && e.ctrlKey) {
+        this.isShowFastRun = !this.isShowFastRun;
+        if (this.isShowFastRun) {
+          this.$nextTick(() => {
+            (this.$refs['fastRunInput'] as any).focus();
+          });
+        }
+      }
+    });
   },
-  computed: {},
   methods: {
     async closeWindow(pid: number) {
       await RestApi.process.kill(pid);
@@ -82,6 +130,8 @@ export default defineComponent({
       applicationList: [] as any[],
       windowList: [] as any[],
       desktopId: 0,
+      isShowFastRun: false,
+      fastRunFilter: '',
     };
   },
 });
@@ -96,10 +146,27 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background-size: cover;
-  overflow: 'hidden';
+  overflow: hidden;
 
   .app {
     user-select: none;
+  }
+
+  .fastRun {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .window {
+      max-width: 50%;
+    }
   }
 }
 </style>

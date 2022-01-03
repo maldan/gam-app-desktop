@@ -10,6 +10,10 @@ github.com/maldan/go-cmhp v0.0.14 h1:+M7InwmXjDJIr07mpx+/OWo75GdpJbqQ5jWsTOsCTm8
 github.com/maldan/go-cmhp v0.0.14/go.mod h1:yctSVSSxzA0/6bbf7stLwdPvs1EVBv5zbLG9An7BawU=
 github.com/maldan/go-cmhp v0.0.19 h1:UzXOpa5RLgjBgrq/LV36wy7ZhPfvclHoQhzeEmKfwhk=
 github.com/maldan/go-cmhp v0.0.19/go.mod h1:AJPrAVJnjTv8gglY++g5Lz8igdiySEKee64ru2Ohno8=
+github.com/maldan/go-cmhp v0.0.20 h1:h8Vj8Di2DR1PTUENkVI/+NmfjxKEKSmG477cN99gDs0=
+github.com/maldan/go-cmhp v0.0.20/go.mod h1:AJPrAVJnjTv8gglY++g5Lz8igdiySEKee64ru2Ohno8=
+github.com/maldan/go-rapi v0.0.6 h1:xLrQv03B6bdsmVOjwDU3RnODI1Enqbf4V+MH8rZn0z0=
+github.com/maldan/go-rapi v0.0.6/go.mod h1:jL732c7fMVoFpvMNz+X60p2gyn682icp8QD9XMc0yA8=
 github.com/maldan/go-restserver v1.2.10 h1:EIsGb4D45qPFcoJofThuvP5LWJDfJyVRlUW/d+63aZI=
 github.com/maldan/go-restserver v1.2.10/go.mod h1:/A3cwalViFQhNuymAfTkXwqN0EC+sM7VaXaL9sFHzsM=
 github.com/maldan/go-restserver v1.2.12 h1:j9DVXCkeWXEEgYSUT3DFs0fHT0MDYqLwMnn3xh6+9Ls=

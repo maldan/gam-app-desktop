@@ -11,6 +11,7 @@ import (
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_net"
 	"github.com/maldan/go-cmhp/cmhp_process"
+	"github.com/maldan/go-rapi/rapi_core"
 )
 
 type ProcessApi struct{}
@@ -44,7 +45,9 @@ func init() {
 
 // Get list of process
 func (u ProcessApi) GetList() interface{} {
-	out := cmhp_process.Exec("gam", "pl")
+	out, err := cmhp_process.Exec("gam", "pl")
+	rapi_core.FatalIfError(err)
+
 	list := make([]core.Process, 0)
 
 	// json.Unmarshal([]byte(out), &list)
@@ -101,10 +104,11 @@ func (u ProcessApi) PostKill(args core.Process) {
 
 // Run process
 func (u ProcessApi) PostRun(args ArgsRun) {
-	out := cmhp_process.Exec("gam",
+	out, err := cmhp_process.Exec("gam",
 		"run",
 		fmt.Sprintf("%v", args.Url),
 		fmt.Sprintf("--host=%v", args.Host))
+	rapi_core.FatalIfError(err)
 
 	l := strings.Split(out, "\n")
 	m := make(map[string]string)

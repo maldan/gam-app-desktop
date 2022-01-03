@@ -2,12 +2,11 @@
   <div>
     <div class="bottom">
       <!-- Open -->
-      <img
+      <ui-button
+        class="controlPanelButton"
         @click.stop="isShowPanel = !isShowPanel"
-        class="clickable control_panel"
-        src="../asset/control_panel.svg"
-        alt="Control Panel"
-        draggable="false"
+        icon="control_panel"
+        :icon-size="32"
       />
 
       <!-- Multiple -->
@@ -45,12 +44,24 @@
         </div>
         <div>{{ time }}</div>
       </div>
+
+      <!-- Info -->
+      <ui-button
+        class="infoButton"
+        @click.stop="isShowHelp = !isShowHelp"
+        icon="info"
+        :icon-size="24"
+        icon-color="#6b93ed"
+      />
     </div>
 
     <!-- Panel -->
     <div v-if="isShowPanel" class="panel">
       <div
-        @click="$emit('run', x.author + '/' + x.name + '@' + x.version), (isShowPanel = false)"
+        @click="
+          $emit('run', x.author + '/' + x.name + '@' + x.version);
+          isShowPanel = false;
+        "
         class="app clickable"
         v-for="x in applicationList"
         :key="x.path"
@@ -67,12 +78,35 @@
         </div>
       </div>
     </div>
+
+    <!-- Help -->
+    <div v-if="isShowHelp" class="help">
+      <div class="window">
+        <div class="content">
+          <h1>Desktop Application</h1>
+          <p>You can open and use GAM application.</p>
+          <h2>API</h2>
+          <p><b>Signal Api</b> - You can send some data to specific application through Desktop.</p>
+          <p>
+            Send example JSON <code>appId: "maldan/fileman", data: "Data"</code> to
+            <i>http://{{ currentHost }}/api/main/applicationData</i>
+          </p>
+          <p>
+            Then desktop will save this data to buffer and then try to send to application process.
+            If it fails to send it will try to send each time you run application. Desktop will send
+            to application the path to JSON file with data. Application must delete this file if
+            success.
+          </p>
+        </div>
+        <ui-button @click="isShowHelp = !isShowHelp" text="Close" style="padding: 5px" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { RestApi } from '../util/RestApi';
+import { RestApi } from '@/util/RestApi';
 import Moment from 'moment';
 
 export default defineComponent({
@@ -108,33 +142,17 @@ export default defineComponent({
           x.isMinimized = false;
           await RestApi.process.setWindow({ ...(x as any), isMinimized: false });
         }
-        /*if (!x.isMinimized) {
-          (this.$root as any).topPid = x.pid;
-        }*/
-        //
-        //x.isMinimized = !x.isMinimized;
-        //await RestApi.process.setWindow({ ...(x as any), isMinimized: x.isMinimized });
       }
-
-      //x.isMinimized = !x.isMinimized;
-      //await RestApi.process.setWindow({ ...(x as any), isMinimized: x.isMinimized });
-      //(this.$root as any).topPid = x.pid;
     },
-
-    /*convertName(name: string) {
-      return name
-        .split('-')
-        .slice(1)
-        .filter((x) => x !== 'app' && x !== 'gam')
-        .join(' ');
-    },*/
   },
   data: () => {
     return {
       isShowPanel: false,
+      isShowHelp: false,
       date: '',
       time: '',
       timer: null as any,
+      currentHost: window.location.host,
     };
   },
 });
@@ -186,6 +204,30 @@ export default defineComponent({
   }
 }
 
+.help {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+
+  .window {
+    background: #2b2b2b;
+    padding: 10px;
+    max-width: 50%;
+
+    .content {
+      color: #a1a1a1;
+      margin-bottom: 10px;
+    }
+  }
+}
+
 .bottom {
   position: fixed;
   bottom: 0;
@@ -197,6 +239,18 @@ export default defineComponent({
   align-items: center;
   z-index: 20;
   user-select: none;
+
+  .controlPanelButton {
+    flex: 0;
+    background: none;
+    padding: 0 5px 0 15px;
+  }
+
+  .infoButton {
+    flex: 0;
+    background: none;
+    padding: 0 15px 0 0;
+  }
 
   .control_panel {
     padding-right: 20px;

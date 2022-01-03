@@ -1,18 +1,20 @@
 package api
 
 import (
-	"os"
 	"strings"
 
 	"github.com/maldan/gam-app-desktop/internal/app/desktop/core"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_process"
+	"github.com/maldan/go-rapi/rapi_core"
 )
 
 type ApplicationApi struct{}
 
 func (u ApplicationApi) GetList() interface{} {
-	out := cmhp_process.Exec("gam", "al")
+	out, err := cmhp_process.Exec("gam", "al")
+	rapi_core.FatalIfError(err)
+
 	var list []core.Application
 
 	lines := strings.Split(out, "\n\n")
@@ -34,15 +36,14 @@ func (u ApplicationApi) GetList() interface{} {
 	return list
 }
 
-func (u ApplicationApi) GetIcon(args ArgsPath) *os.File {
-	args.Context.ContentType = "image/svg+xml"
+func (u ApplicationApi) GetIcon(ctx *rapi_core.Context, args ArgsPath) string {
+	ctx.IsServeFile = true
 
 	if cmhp_file.Exists(args.Path + "/" + "icon.svg") {
-		f, _ := os.Open(args.Path + "/" + "icon.svg")
-		return f
+		return args.Path + "/" + "icon.svg"
 	}
-	f, _ := os.Open("app.svg")
-	return f
+
+	return "app.svg"
 }
 
 // Save config
