@@ -46,6 +46,8 @@ func Start(frontFs embed.FS) {
 		io.Copy(destination, source)
 	} */
 
+	// https://d1v-h.phncdn.com/hls/videos/202111/21/398393381/,1080P_4000K,720P_4000K,480P_2000K,240P_1000K,_398393381.mp4.urlset/index-f2-v1-a1.m3u8?ttl=1641250256&l=0&clientip=77.40.3.32&ipa=77.40.3.32&hash=ebb60e6baa41bc447514d07230b1df1f&
+
 	// Load config
 	cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
 

@@ -18,20 +18,34 @@
       </div>
 
       <div style="margin-left: auto; display: flex">
-        <ui-button @mousedown.stop="" @click.stop="openSettings()" class="button" icon="gear" />
-        <ui-button @mousedown.stop="" @click.stop="openInfo()" class="button" icon="info" />
+        <ui-button
+          @mousedown.stop=""
+          @click.stop="openSettings()"
+          class="button"
+          icon="gear"
+          icon-color="#7e7e7e"
+        />
+        <ui-button
+          @mousedown.stop=""
+          @click.stop="openInfo()"
+          class="button"
+          icon="info"
+          icon-color="#4672b5"
+        />
         <ui-button @mousedown.stop="" @click.stop="minimize()" class="button" icon="minimize" />
         <ui-button
           @mousedown.stop=""
           @click.stop="isShowDockOption = !isShowDockOption"
           class="button"
           icon="maximize"
+          icon-color="#2f8b0a"
         />
         <ui-button
           @mousedown.stop=""
           @click.stop="$emit('close', modelValue.pid)"
           class="button"
           icon="close"
+          icon-color="#b12929"
         />
 
         <div class="dock_option" v-if="isShowDockOption">
@@ -40,9 +54,8 @@
             :key="x.value"
             @click.stop="setDock(x.value)"
             class="clickable"
-            :class="x.value === modelValue.dock ? 'selected' : ''"
           >
-            <ui-icon :name="x.icon" />
+            <ui-icon :name="x.icon" :color="x.value === modelValue.dock ? '#00ff00' : '#999999'" />
           </button>
         </div>
       </div>
@@ -122,8 +135,8 @@ export default defineComponent({
       if (this.isDrag) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          x: this.modelValue.x + (pageX - this.capture.x),
-          y: this.modelValue.y + (pageY - this.capture.y),
+          x: Math.max(this.modelValue.x + (pageX - this.capture.x), 0),
+          y: Math.max(this.modelValue.y + (pageY - this.capture.y), 0),
         });
       }
 
@@ -145,7 +158,7 @@ export default defineComponent({
       if (this.isDragR) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          width: this.modelValue.width + (pageX - this.capture.x),
+          width: Math.max(this.modelValue.width + (pageX - this.capture.x), 320),
         });
       }
 
@@ -153,14 +166,14 @@ export default defineComponent({
         this.$emit('update:modelValue', {
           ...this.modelValue,
           x: this.modelValue.x + (pageX - this.capture.x),
-          width: this.modelValue.width - (pageX - this.capture.x),
+          width: Math.max(this.modelValue.width - (pageX - this.capture.x), 320),
         });
       }
 
       if (this.isDragR && this.isDragB) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          width: this.modelValue.width + (pageX - this.capture.x),
+          width: Math.max(this.modelValue.width + (pageX - this.capture.x), 320),
           height: this.modelValue.height + (pageY - this.capture.y),
         });
       }
@@ -169,7 +182,7 @@ export default defineComponent({
         this.$emit('update:modelValue', {
           ...this.modelValue,
           x: this.modelValue.x + (pageX - this.capture.x),
-          width: this.modelValue.width - (pageX - this.capture.x),
+          width: Math.max(this.modelValue.width - (pageX - this.capture.x), 320),
           height: this.modelValue.height + (pageY - this.capture.y),
         });
       }
@@ -177,7 +190,7 @@ export default defineComponent({
       if (this.isDragR && this.isDragT) {
         this.$emit('update:modelValue', {
           ...this.modelValue,
-          width: this.modelValue.width + (pageX - this.capture.x),
+          width: Math.max(this.modelValue.width + (pageX - this.capture.x), 320),
           y: this.modelValue.y + (pageY - this.capture.y),
           height: this.modelValue.height - (pageY - this.capture.y),
         });
@@ -189,7 +202,7 @@ export default defineComponent({
           y: this.modelValue.y + (pageY - this.capture.y),
           height: this.modelValue.height - (pageY - this.capture.y),
           x: this.modelValue.x + (pageX - this.capture.x),
-          width: this.modelValue.width - (pageX - this.capture.x),
+          width: Math.max(this.modelValue.width - (pageX - this.capture.x), 320),
         });
       }
 
@@ -222,6 +235,13 @@ export default defineComponent({
       if (model.dock === 'right') {
         left = '50%';
         width = '50%';
+      }
+
+      if (this.isMobile()) {
+        left = '0';
+        top = '0';
+        width = '100%';
+        height = 'calc(100% - 40px)';
       }
 
       return {
@@ -341,6 +361,9 @@ export default defineComponent({
       } catch (e) {
         alert(e);
       }
+    },
+    isMobile() {
+      return window.outerWidth <= 576;
     },
   },
   data: () => {

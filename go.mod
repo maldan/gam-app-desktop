@@ -1,6 +1,6 @@
 module github.com/maldan/gam-app-desktop
 
-go 1.16
+go 1.18
 
 // replace github.com/maldan/go-restserver => ../../../go_lib/restserver
 // replace github.com/maldan/go-cmhp => ../../../go_lib/cmhp

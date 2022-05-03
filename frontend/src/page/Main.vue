@@ -25,7 +25,13 @@
         <ui-input
           ref="fastRunInput"
           @keyup.enter="
-            run(fastRunApplicationList[0].name);
+            run(
+              fastRunApplicationList[0].author +
+                '/' +
+                fastRunApplicationList[0].name +
+                '@' +
+                fastRunApplicationList[0].version,
+            );
             isShowFastRun = false;
             fastRunFilter = '';
           "

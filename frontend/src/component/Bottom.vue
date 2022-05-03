@@ -34,7 +34,7 @@
           :alt="x.name"
           draggable="false"
         />
-        <div>{{ x.name.replace(/_/g, ' ') }}</div>
+        <div v-if="!isMobile()">{{ x.name.replace(/_/g, ' ') }}</div>
       </div>
 
       <!-- Time -->
@@ -52,6 +52,7 @@
         icon="info"
         :icon-size="24"
         icon-color="#6b93ed"
+        v-if="!isMobile()"
       />
     </div>
 
@@ -143,6 +144,9 @@ export default defineComponent({
           await RestApi.process.setWindow({ ...(x as any), isMinimized: false });
         }
       }
+    },
+    isMobile() {
+      return window.outerWidth <= 576;
     },
   },
   data: () => {
