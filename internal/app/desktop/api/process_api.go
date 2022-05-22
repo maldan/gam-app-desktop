@@ -37,7 +37,7 @@ func init() {
 				m[key.(string)] = value.(core.Window)
 				return true
 			})
-			cmhp_file.WriteJSON(core.DataDir+"/window.json", &m)
+			cmhp_file.Write(core.DataDir+"/window.json", &m)
 			time.Sleep(time.Second)
 		}
 	})()

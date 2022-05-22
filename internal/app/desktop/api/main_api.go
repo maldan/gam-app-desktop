@@ -31,7 +31,7 @@ func (u MainApi) PostApplicationData(args ArgsAppData) {
 
 	// Store data
 	fileName := fmt.Sprintf("%v.json", time.Now().UnixNano())
-	cmhp_file.WriteText(core.DataDir+"/external_data/"+appId+"/"+fileName, args.Data)
+	cmhp_file.Write(core.DataDir+"/external_data/"+appId+"/"+fileName, args.Data)
 
 	// Try to send data
 	go SendDataToProcess(appId)

@@ -48,7 +48,7 @@ func (u ApplicationApi) GetIcon(ctx *rapi_core.Context, args ArgsPath) string {
 
 // Save config
 func (r ApplicationApi) PostConfig(args ArgsConfig) {
-	cmhp_file.WriteJSON(core.DataDir+"/../"+args.AppId+"/config.json", &args.Config)
+	cmhp_file.Write(core.DataDir+"/../"+args.AppId+"/config.json", &args.Config)
 }
 
 // Get config
