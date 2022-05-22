@@ -4,8 +4,6 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"time"
-
 	"github.com/maldan/gam-app-desktop/internal/app/desktop/api"
 	"github.com/maldan/gam-app-desktop/internal/app/desktop/core"
 	"github.com/maldan/go-cmhp/cmhp_file"
@@ -14,6 +12,8 @@ import (
 	"github.com/maldan/go-rapi/rapi_core"
 	"github.com/maldan/go-rapi/rapi_rest"
 	"github.com/maldan/go-rapi/rapi_vfs"
+	"log"
+	"time"
 )
 
 func Start(frontFs embed.FS) {
@@ -52,7 +52,7 @@ func Start(frontFs embed.FS) {
 	cmhp_file.ReadJSON(core.DataDir+"/config.json", &core.AppConfig)
 
 	// Backup schedule
-	go func() {
+	/*go func() {
 		fmt.Println("START SCHEDULLER")
 
 		for {
@@ -62,6 +62,18 @@ func Start(frontFs embed.FS) {
 				fmt.Println(cmhp_process.Exec("gam", "backup", app))
 			}
 			fmt.Println("Backuped")
+			time.Sleep(time.Hour * 6)
+		}
+	}()*/
+
+	go func() {
+		log.Println("START SCHEDULER")
+
+		for {
+			log.Println(cmhp_process.Exec(
+				"rsync", "-ra", "--progress", "--delete", "--no-compress",
+				"/root/.gam-data/", "/home/backup/gam-data",
+			))
 			time.Sleep(time.Hour * 6)
 		}
 	}()
